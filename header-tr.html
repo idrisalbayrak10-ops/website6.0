@@ -1,0 +1,203 @@
+<header class="site-header" role="banner">
+  <div class="header-inner">
+
+    <!-- Left: logo icon + AI assistant + account -->
+    <div class="logo-sub-icons">
+
+      <!-- LOGO -->
+      <a href="/index.html" class="header-logo-icon" aria-label="Alba Space ana sayfa">
+        <img src="/assets/images/albalogo.png" alt="Alba Space logo" width="32" height="32">
+      </a>
+
+      <!-- AI BUTTON -->
+      <a href="javascript:void(0);" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
+        <img src="/assets/images/albamenai.png" alt="AI assistant" width="32" height="32">
+      </a>
+
+      <!-- ACCOUNT -->
+      <div class="alien-dropdown-container">
+        <a href="javascript:void(0);"
+           class="alien-ghost"
+           aria-label="Hesap menüsü"
+           aria-controls="alienMenu"
+           aria-expanded="false"
+           aria-haspopup="true"
+           title="Giriş"
+           onclick="toggleAlienMenu(event)">
+          <img id="accountAvatar" src="/assets/icons/alien.png" alt="Account" width="32" height="32">
+        </a>
+
+        <div id="alienMenu" class="alien-menu" role="menu" hidden>
+
+          <a href="javascript:void(0);" class="alien-menu-item open-login" role="menuitem">
+            Giriş Yap
+          </a>
+
+          <button type="button"
+                  class="alien-menu-item alien-menu-google"
+                  onclick="login()"
+                  role="menuitem">
+            Google ile Giriş Yap
+          </button>
+
+          <a href="javascript:void(0);" class="alien-menu-item open-signup" role="menuitem">
+            Kayıt Ol
+          </a>
+
+          <div id="user" class="worker-auth-user"></div>
+
+          <button type="button"
+                  class="alien-menu-item"
+                  onclick="logout()">
+            Çıkış Yap
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Logo -->
+    <a href="/index.html" class="header-logo main-center-logo" aria-label="Alba Space">
+      <img src="/assets/images/albaspace.png" alt="Alba Space" class="albaspace-img">
+    </a>
+
+    <!-- Navigation -->
+    <nav class="main-nav" aria-label="Ana menü">
+      <div class="dropdown">
+        <a href="/hizmetler.html" class="dropdown-trigger">HİZMETLER</a>
+        <div class="dropdown-menu">
+          <a href="/hizmetler.html">HİZMETLER</a>
+          <a href="https://albaspace.com.tr/hyperclub" target="_blank" rel="noopener">Hyper Club</a>
+        </div>
+      </div>
+
+      <a href="/shop.html">MAĞAZA</a>
+
+      <div class="dropdown">
+        <a href="/albamen.html" class="dropdown-trigger">ALBAMEN</a>
+        <div class="dropdown-menu">
+          <a href="/albamen.html">ALBAMEN</a>
+          <a href="/atlas.html">ATLAS</a>
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <a href="/hakkimizda.html" class="dropdown-trigger">HAKKIMIZDA</a>
+        <div class="dropdown-menu">
+          <a href="/hakkimizda.html">HAKKIMIZDA</a>
+          <a href="/basindabiz.html">BASINDA BİZ</a>
+          <a href="/galeri.html">GALERİ</a>
+          <a href="/iletisim.html">İLETİŞİM</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Right -->
+    <div class="header-social">
+      <div class="social-row">
+        <a href="https://www.instagram.com/albaspace_/" target="_blank">
+          <img src="/assets/icons/inst.png">
+        </a>
+        <a href="https://www.linkedin.com/in/idrisalbayrak/" target="_blank">
+          <img src="/assets/icons/linkdin.png">
+        </a>
+        <a href="https://wa.me/905387781018" target="_blank">
+          <img src="/assets/icons/watsupp.png">
+        </a>
+        <a href="https://www.youtube.com/@AlbaSpaceTr" target="_blank">
+          <img src="/assets/icons/youtube.png">
+        </a>
+      </div>
+
+      <div class="top-lang-switch">
+        <a href="/index.html">
+          <img src="/assets/icons/flag-tr.png" width="24">
+        </a>
+        <a href="/eng/index.html">
+          <img src="/assets/icons/flag-us.png" width="24">
+        </a>
+        <a href="/rus/index.html">
+          <img src="/assets/icons/flag-rus.png" width="24">
+        </a>
+
+        <a href="/cart.html" class="header-cart-link">
+          <span class="header-cart-icon">
+            <img src="/assets/icons/chart.png" width="28">
+            <span class="header-cart-count" data-cart-count>0</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<link rel="stylesheet" href="/assets/css/dropdown-optimized.css">
+
+<script src="/assets/js/menu-toggle.js" defer></script>
+<script src="/assets/js/cart.js" defer></script>
+<script src="/assets/js/lang-switch.js" defer></script>
+<script src="/assets/js/ai-widget.js" defer></script>
+<script src="/assets/js/model-nav-loader.js" defer></script>
+<script src="/assets/js/mobile-header-cart.js" defer></script>
+
+<!-- 🔐 AUTH LOGIC -->
+<script>
+const API = "https://albaspace-api.nncdecdgc.workers.dev";
+
+function login() {
+  window.location.href = API + "/auth/google";
+}
+
+function logout() {
+  document.cookie = "user_id=; Max-Age=0; path=/;";
+  location.reload();
+}
+
+async function checkUser() {
+  try {
+    const res = await fetch(API + "/me", { credentials: "include" });
+    if (res.status !== 200) return;
+
+    const user = await res.json();
+
+    document.getElementById("user").innerHTML =
+      '<div style="display:flex;gap:8px;padding:8px;">' +
+      '<img src="' + user.avatar + '" width="28" style="border-radius:50%">' +
+      '<span>' + user.name + '</span>' +
+      '</div>';
+
+    document.getElementById("accountAvatar").src = user.avatar;
+
+  } catch(e) {}
+}
+
+checkUser();
+</script>
+
+<script>
+(function () {
+  function toggleAlienMenu(e) {
+    e.preventDefault();
+    const menu = document.getElementById('alienMenu');
+    const trigger = document.querySelector('.alien-ghost');
+
+    if (menu.hasAttribute('hidden')) {
+      menu.removeAttribute('hidden');
+      trigger.setAttribute('aria-expanded', 'true');
+    } else {
+      menu.setAttribute('hidden', '');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const container = document.querySelector('.alien-dropdown-container');
+    if (container && !container.contains(e.target)) {
+      document.getElementById('alienMenu').setAttribute('hidden', '');
+    }
+  });
+
+  window.toggleAlienMenu = toggleAlienMenu;
+})();
+</script>

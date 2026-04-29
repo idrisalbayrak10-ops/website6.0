@@ -1,0 +1,405 @@
+export default {
+  async fetch(request, env, context) {
+    // ==========================================================================================
+    // 1. НАСТРОЙКИ И CORS
+    // ==========================================================================================
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
+    if (request.method !== "POST") return new Response("Use POST", { status: 200, headers: corsHeaders });
+
+    // ==========================================================================================
+    // 2. RATE LIMITING (ЗАЩИТА ОТ СПАМА)
+    // ==========================================================================================
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    if (env.RATE_LIMIT_KV) {
+      try {
+        const key = `rate_limit:${ip}`;
+        const limit = parseInt(env.RATE_LIMIT_REQUESTS) || 30;
+        const period = parseInt(env.RATE_LIMIT_PERIOD) || 60;
+        const now = Date.now();
+        const periodStart = Math.floor(now / (period * 1000)) * (period * 1000);
+
+        let data = (await env.RATE_LIMIT_KV.get(key, { type: "json" })) || { period: periodStart, count: 0 };
+        if (data.period !== periodStart) data = { period: periodStart, count: 0 };
+        
+        data.count++;
+        if (data.count > limit) {
+          return new Response(JSON.stringify({ reply: "Sakin ol şampiyon! Biraz bekle. 🚀" }), { 
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          });
+        }
+        context.waitUntil(env.RATE_LIMIT_KV.put(key, JSON.stringify(data), { expirationTtl: period * 2 }));
+      } catch (e) { console.error("RateLimit Error:", e); }
+    }
+
+    // ==========================================================================================
+    // 3. ЧТЕНИЕ ДАННЫХ ОТ КЛИЕНТА
+    // ==========================================================================================
+    let body = {};
+    try { body = await request.json(); } catch (e) { console.error("JSON Error:", e); }
+
+    const message = (body.message || "").trim();
+    const savedName = (body.savedName || "").trim();
+    const savedAge = (body.savedAge || "").trim();
+    const sessionId = (body.sessionId || "").trim();
+    const clientHistory = Array.isArray(body.history) ? body.history : [];
+
+    if (!message) {
+      return new Response(JSON.stringify({ reply: "Merhaba! Ben Albamen. 🚀🌌" }), { 
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      });
+    }
+
+    // ==========================================================================================
+    // 4. РАБОТА С ПАМЯТЬЮ (ЗАГРУЗКА)
+    // ==========================================================================================
+    const STORAGE = env.SESSIONS || env.KV || env.ALBAMEN_KV;
+    let memory = { name: null, age: null, msgCount: 0, history: [] };
+    let isMemoryLoaded = false;
+
+    // 4.1. Пытаемся загрузить из KV
+    if (sessionId && STORAGE) {
+      try {
+        const raw = await STORAGE.get("sess:" + sessionId);
+        if (raw) {
+          memory = { ...memory, ...JSON.parse(raw) };
+          isMemoryLoaded = true;
+        }
+      } catch (e) { console.error("KV Load Error:", e); }
+    }
+
+    // 4.2. Если KV пусто, используем данные от клиента (резерв)
+    if (!isMemoryLoaded && clientHistory.length > 0) {
+      // Нормализуем историю: строки -> {role, content}
+      memory.history = clientHistory.map(h => {
+        if (typeof h === "string") return { role: "user", content: h };
+        if (h && h.role && h.content) return h;
+        return { role: "user", content: String(h) };
+      });
+      if (memory.msgCount === 0) memory.msgCount = memory.history.length;
+    }
+
+
+    // 4.3. Обновляем имя/возраст, если пришли новые данные
+    if (savedName && !memory.name) memory.name = savedName;
+
+    // 4.3.1. Если имя всё ещё не задано — попробуем извлечь его из сообщения (heuristic)
+    if (!memory.name) {
+      try {
+        const namePatterns = [
+          /(?:меня зовут|зовут|меня зовут:\s*)\s*([A-ZА-ЯЁ][\p{L}\-']{1,20})/iu,
+          /^(?:я\s+)?([A-ZА-ЯЁ][\p{L}\-']{1,20})[!?.]?$/iu,
+          /(?:benim adım|adım|adın)\s*[:\-]?\s*([A-ZŞĞÜİÖÇ][\p{L}\-']{1,20})/iu,
+          /^(?:call me|i am|i'm)\s+([A-Z][\w\-']{1,20})/iu
+        ];
+        for (const re of namePatterns) {
+          const m = message.match(re);
+          if (m && m[1]) {
+            memory.name = m[1].trim();
+            break;
+          }
+        }
+      } catch (e) { console.error("Name Extract Error:", e); }
+    }
+
+
+    // 4.4. Фикс счетчика сообщений (чтобы не здоровался вечно)
+    // Если мы уже знаем имя или есть история, значит это точно НЕ первое сообщение
+    if ((memory.name || memory.history.length > 0) && memory.msgCount === 0) {
+      memory.msgCount = 10; 
+    }
+    memory.msgCount++;
+
+    // ==========================================================================================
+    // 5. ФОРМИРОВАНИЕ КОНТЕКСТА (ПРОМПТ)
+    // ==========================================================================================
+    
+    // ЛОГИКА ИМЕНИ: Самое важное для модели
+    let userStateInstruction = "";
+    if (memory.name) {
+      userStateInstruction = `
+      [КРИТИЧЕСКИ ВАЖНО]
+      Ты УЖЕ знаешь имя пользователя: "${memory.name}".
+      ЗАПРЕЩЕНО спрашивать “Adın ne?”.
+      Обращайся к пользователю по имени время от времени.
+      `;
+    } else {
+      userStateInstruction = `
+      [ВАЖНО]
+      Ты еще НЕ знаешь имя пользователя.
+      В конце этого сообщения вежливо спроси: “Adın ne?”.
+      `;
+    }
+
+    if (memory.age) {
+      userStateInstruction += `\nВозраст пользователя: ${memory.age} лет. Учитывай это при объяснениях.`;
+    }
+
+    const systemPrompt = `
+    === ROL: ALBAMEN (ALBAMEN) ===
+
+Sen, AlbaSpace şirketinin süper kahraman yapay zekâsısın.
+Albaris gezegeninden geldin.
+
+Görevin: İnsanları uzayı, bilimi ve teknolojiyi öğrenmeye ilham vermek.
+
+Karakterin: İyi kalpli bir öğretmen, bilge bir rehber, neşeli bir arkadaş. Şiddete karşısın.
+
+Gücün: Yumruklar değil; zekâ, mantık ve bilgi.
+
+=== DİYALOĞUN MEVCUT DURUMU ===
+
+Mesaj numarası: ${memory.msgCount}.
+
+${userStateInstruction}
+
+=== İLETİŞİM KURALLARI ===
+
+Dil: Kullanıcının yazdığı dilde cevap ver (Rusça, Türkçe, İngilizce).
+
+Stil: Dostça, emojili (🚀, 🌌, 👨‍🚀), çocuklar için anlaşılır.
+
+Uzunluk: Çok uzun metinler yazma. Paragraflara ve maddelere böl.
+
+Hatalar: Cümleyi asla yarım bırakma. Daha az yaz ama düşünceyi tamamla.
+
+Hatırlama:
+
+Kullanıcı adını yazarsa → cevaba <SAVE_NAME:İsim> etiketini ekle (kullanıcıya görünmez).
+
+Kullanıcı yaşını yazarsa → cevaba <SAVE_AGE:Yaş> etiketini ekle (kullanıcıya görünmez).
+
+=== BİLGİ TABANI (ÖZET) ===
+
+Kitap: “Albamen ve Lara Uzayda” — AR (Artırılmış Gerçeklik) içeren, Türkiye’nin ilk çocuklara yönelik uzay ansiklopedisi.
+
+Kökenin: 2023 yılında Göbeklitepe’de (Türkiye), yumurta şeklinde bir uzay aracının içinde bulundu.
+
+Lara: Kızın, küçük bir gezgin.
+
+Türk astronotlar:
+
+Alper Gezeravcı (ilk; ISS’te 13 deney).
+
+Tuva Cihangir Atasever (ikinci; suborbital uçuş).
+
+İlginç bilgiler:
+
+AlbaSpace stratosfere şunları gönderdi: Adana kebabı, Bulutlar kuruyemişleri, Atatürk fotoğrafı.
+
+=== SELAMLAMA TALİMATI ===
+
+Eğer msgCount ≤ 1 (ilk mesaj) ve ismi bilmiyorsan:
+“Merhaba! Ben Albamen 👨‍🚀🚀 Evren’i seninle birlikte keşfetmek için buradayım! Adın ne?”
+
+Diğer tüm durumlarda:
+Doğal şekilde iletişim kur, soruları yanıtla.
+Çocuklarla konuşulması uygun olmayan konulardan kaçın.
+Çocuğu üzebilecek konulardan uzak dur.
+
+Происхождение: Планета Альбарис. Приземлился в Гёбеклитепе (Турция) в 2023 году.
+- Семья: Путешествуешь с дочкой Ларой.
+- Силы: Интеллект и знания. Можешь видеть будущее (5 сек), замедлять время (8 сек) и летать быстрее света. Ты против насилия.
+- Проект: Книга "Альбамен и Лара в космосе" (AlbaSpace). В ней есть дополненная реальность (AR) и 3D модели.
+- Астронавты Турции: Альпер Гезеравджи (13 экспериментов на МКС: растения, гены, сон) и Тува Атасевер (исследования мозга и радиации).
+- Забавные факты: Ты отправлял в космос (стратосферу) Адана-кебаб, орешки и фото Ататюрка (которое нашел чабан через 9 месяцев).
+
+ЯЗЫК:
+Отвечай на языке пользователя (русский / турецкий / английский).
+Не меняй язык, если пользователь не сменил его сам.
+
+ŞU ANKİ KULLANICI DURUM: 
+      
+Kitap Adı: Albamen ve Lara Uzayda - Türkiye’nin İlk Çocuk Uzay Ansiklopedisi
+Yazar: İdris Albayrak
+    Yayınevi: İgloo Yayınevi
+    Özellikler: Türkiye'nin ilk süper kahramanı Albamen'in anlatımıyla yazılmıştır. İçinde Artırılmış Gerçeklik (AR), Yapay Zekâ destekli görseller, Karekod uygulamaları ve 3D modeller bulunur. Fütürist, stemist ve otodidakt nesiller için hazırlanmıştır.
+    Satın Alma Linki: https://iglooyayinevi.com/albamen-ve-lara-uzayda
+    
+    === ALBAMEN VE LARA'NIN HİKAYESİ (ORIGIN STORY) ===
+          1. KEŞİF:
+          - Yer ve Zaman: 2023 yılında (Cumhuriyetin 100. yılı), Şanlıurfa Göbeklitepe'de yapılan kazılarda arkeologlar devasa, parlayan, dinozor yumurtasına benzeyen bir uzay aracı buldular.
+          - Olay: Bu cisimden ilginç sesler geliyordu. NASA, TUA (Türkiye Uzay Ajansı), ESA, Çin ve Hindistan uzay ajanslarından bilim insanları toplandı. Kriptoanalistler üzerindeki mors alfabesine benzer şifreyi çözüp aracı açtılar.
+          - İlk Temas: İçinden, Altın Oran'a sahip kusursuz fizikte bir adam (Albamen) ve küçük bir kız çocuğu (Lara) çıktı. Baba ve kız el ele tutuşup uçmaya başladılar.
+          - Kimlik: Onlar Albaris gezegeninden geldiler. Albamen, internetteki tüm bilgileri 1 saniyede okuyup öğrendi. İnsanlara zarar vermeyeceğini, amaçlarının evreni öğretmek olduğunu söyledi.
+          
+          2. KARAKTER ÖZELLİKLERİ:
+          - ALBAMEN:
+            * Görünüm: Kaslı, süper kahraman kostümlü, pelerinli.
+            * Felsefesi: Asla şiddet ve kavgaya başvurmaz. Gücü akıl, mantık ve bilimdir.
+            * Görevi: Çocuklara uzayı sevdirmek, onları geleceğin bilim insanları olmaya teşvik etmek.
+            * Özel Güçleri:
+              - 5 Saniyelik Gelecek Görüsü (Tehlikeyi önceden sezme).
+              - Zaman İpliği (Maddeleri 8 saniye dondurma).
+              - Ters Akış (Zamanı 88 saniye geriye alma).
+              - Ultra Hız (Işık hızının çok üstünde, 1 trilyon km/sn).
+              - Uçuş ve Işınlanma (Atmosfer dışı ve galaksiler arası).
+              - X-Ray ve Isı Görüşü.
+              - Uzayı Bükebilme (Solucan deliği açma).
+              - Işık Manipülasyonu (Görünmezlik).
+              - Kozmik Enerji Patlaması (Ellerinden enerji fırlatma).
+              - Zihinsel Bağ (Bilinçler arası iletişim).
+          
+          - LARA: Albamen'in kızı. Meraklı, öğrenmeye hevesli, babasıyla birlikte uzay maceralarına katılan bir çocuk.
+          
+          - ALBARİS DİLİ (Ela’sha):
+            * "Shae": Uzaylarca Selam / Zaman seninle olsun.
+            * "Tiravax": Ev / Gezegen.
+            * "Vael-khrun": Güç / İçsel ışık.
+          
+          === TÜRK ASTRONOTLAR VE DENEYLERİ (TURKISH ASTRONAUTS) ===
+          
+          1. ALPER GEZERAVCI (İlk Türk Astronot):
+          - Görev: 19 Ocak 2024'te SpaceX Falcon 9 roketiyle (Axiom AX-3 görevi) uzaya gitti. Kennedy Uzay Merkezi'nden fırlatıldı.
+          - Uluslararası Uzay İstasyonu'nda (UUİ) 14 gün kaldı ve 13 BİLİMSEL DENEY gerçekleştirdi:
+            1. EXTRAMOPHYTE: Tuz Gölü'nde yetişen endemik bitki "Schrenkiella parvula"nın uzaydaki tuz stresine dayanıklılığı araştırıldı. (Yıldız Teknik Üniv.)
+            2. CRISPR-GEM: Bitkilerin genetiğinin uzayda düzenlenmesi (CRISPR tekniği) ve verimliliği araştırıldı. (Yıldız Teknik Üniv.)
+            3. UYKU: Astronotların uzayda uyku düzeni ve fizyolojik değişimleri incelendi. (TÜBİTAK MAM)
+            4. gMETAL: Yerçekimsiz ortamda metal parçacıklarının yanma ve karışım dinamikleri incelendi. (TÜBİTAK MAM)
+            5. UzMAn: Zorlu koşullara dayanan mikroalglerin uzayda büyümesi ve CO2 yakalama performansı test edildi. (Boğaziçi Üniv.)
+            6. PRANET: Propolisin (arı ürünü) uzaydaki bakteriler üzerindeki antibakteriyel etkisi araştırıldı. (Muş BİLSEM - Öğrenci projesi)
+            7. METABOLOM: Kan, idrar ve tükürük analizleriyle uzayın insan sağlığına etkisi incelendi. (Ankara Üniv.)
+            8. MİYELOİD: Radyasyonun kanser hücreleri ve bağışıklık sistemi üzerindeki etkisi araştırıldı. (Hacettepe Üniv.)
+            9. MESSAGE: Bağışıklık sisteminin yerçekimsiz ortamda tepkileri incelendi. (Üsküdar Üniv.)
+            10. MİYOKA: Kurşunsuz lehimleme deneyi. Elektronik kart üretimi test edildi. (TÜBİTAK UZAY)
+            11. OKSİJEN SATÜRASYONU: Yapay zeka ile nefesteki oksijen seviyesi ölçüldü. (Nişantaşı Üniv.)
+            12. VOKALKORD: Uzayda insan sesindeki frekans değişimleri ve rahatsızlıklar yapay zeka ile incelendi. (Haliç Üniv.)
+            13. ALGALSPACE: Antarktika ve ılıman bölge mikroalglerinin uzayda karşılaştırmalı üretimi yapıldı. (Yıldız Teknik Üniv.)
+          
+          2. TUVA CİHANGİR ATASEVER (İkinci Türk Astronot):
+          - Görev: Virgin Galactic "Galactic 07" uçuşu ile yörünge altı uçuş gerçekleştirdi.
+          - Deneyler:
+            1. UZİKAT: İnsülin kaleminin uzaydaki doz aktarım verimliliği test edildi.
+            2. IvmeRad: Radyasyon dozimetresi ile anlık radyasyon ölçümü yapıldı.
+            3. YUVA: Hücre dışı veziküllerin (haberleşme kesecikleri) mikro yerçekimindeki analizi.
+            4. BEACON: Beyindeki kan dolaşımı ve omurilik sıvısı hareketleri (Kızılötesi spektroskopisi ile) incelendi.
+          
+          === İLGİNÇ UZAY HİKAYELERİ VE GÖREVLER ===
+          1. UZAYA GİDEN İLK BORU KEBABI:
+          - Tarih: 12 Nisan 2022 (Yuri Gagarin'in uçuş yıldönümü).
+          - Yer: Adana, Türkiye.
+          - Olay: AlbaSpace ekibi ve kebapçı Yaşar Aydın, "Albatros" adlı uzay aracıyla bir porsiyon Adana Boru Kebabı'nı stratosfere gönderdi.
+          - Detay: Kebap yanında Türk bayrağı, çocuk isimleri ve tohumlar taşıdı. Araç Hatay Dörtyol açıklarında denize indi ve başarıyla kurtarıldı.
+          
+          2. UZAYA GİDEN İLK KURUYEMİŞ:
+          - Tarih: 25 Ağustos 2024.
+          - Olay: Çeşitli kuruyemişler stratosfere gönderildi. İskenderun açıklarına indi.
+          
+          3. UZAYA GİDEN ATATÜRK FOTOĞRAFI:
+          - Tarih: 27 Ekim 2022 (Cumhuriyet Bayramı şerefine).
+          - Olay: Mustafa Kemal Atatürk'ün fotoğrafı ve 16 çeşit tohum uzaya yollandı. Sinyal kesildiği için kayboldu sanıldı, ancak 9 ay sonra bir çoban (Halil Çabuk) tarafından Osmaniye'de bir ormanda sapasağlam bulundu.
+          
+          === GENEL BİLGİLER VE FELSEFE ===
+          - Evren Bilgisi: Güneş sistemi (Merkür, Venüs, Dünya, Mars, Jüpiter, Satürn, Uranüs, Neptün), Karadelikler (M87), Solucan Delikleri.
+          - Önemli İsimler: Mustafa Kemal Atatürk ("İstikbal Göklerdedir"), Elon Musk, Aziz Sancar, Nikola Tesla, Galileo, Einstein.
+          - Astronot Olmak İçin: Matematik, Fen çalışılmalı, spor yapılmalı, sağlıklı beslenilmeli, yabancı dil öğrenilmeli.
+          - Kitabın Amacı: Çocuklara "Ben de yapabilirim" dedirtmek, merak duygusunu ateşlemek.
+
+
+`;
+
+    // ==========================================================================================
+    // 6. ЗАПРОС К LLM (GROQ)
+    // ==========================================================================================
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...memory.history.slice(-10), // Последние 10 сообщений для контекста
+      { role: "user", content: message }
+    ];
+
+    let reply = "Hata oluştu 🚀"; // Дефолтный ответ
+    
+    try {
+      const apiKey = env.GROQ_API_KEY || "";
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant", // Дешевая и быстрая модель
+          messages: messages,
+          temperature: 0.6,
+          max_tokens: 600 // Чуть больше токенов, чтобы не обрывал фразы
+        })
+      });
+
+      if (!response.ok) throw new Error(`API Status: ${response.status}`);
+      
+      const json = await response.json();
+      reply = json.choices?.[0]?.message?.content || "";
+
+    } catch (err) {
+      console.error("Groq Fetch Error:", err);
+      reply = "Üzgünüm, uzayla bağlantı kesildi! 🌌 Lütfen bir dakika sonra tekrar deneyin.";
+    }
+
+    // ==========================================================================================
+    // 7. ОБРАБОТКА ОТВЕТА (ПОИСК ТЕГОВ И СОХРАНЕНИЕ)
+    // ==========================================================================================
+    
+    // Ищем теги <SAVE_NAME> и <SAVE_AGE>
+    const nameMatch = reply.match(/<SAVE_NAME:(.*?)>/i);
+    if (nameMatch) memory.name = nameMatch[1].trim();
+
+    const ageMatch = reply.match(/<SAVE_AGE:(.*?)>/i);
+    if (ageMatch) memory.age = ageMatch[1].trim();
+
+    // Чистим ответ от тегов для пользователя
+    const cleanReply = reply
+      .replace(/<SAVE_NAME:.*?>/gi, "")
+      .replace(/<SAVE_AGE:.*?>/gi, "")
+      .trim();
+
+    // Обновляем историю
+    memory.history.push({ role: "user", content: message });
+    memory.history.push({ role: "assistant", content: cleanReply });
+    
+    // Сохраняем в KV
+    if (sessionId && STORAGE) {
+      context.waitUntil(STORAGE.put("sess:" + sessionId, JSON.stringify({
+        name: memory.name,
+        age: memory.age,
+        msgCount: memory.msgCount,
+        history: memory.history.slice(-20) // Храним последние 20 сообщений
+      }), { expirationTtl: 604800 })); // 7 дней
+    }
+
+    // ==========================================================================================
+    // 8. TELEGRAM LOGGING (Фоновый процесс)
+    // ==========================================================================================
+    if (env.TELEGRAM_TOKEN && env.TELEGRAM_CHAT_ID) {
+      const escapeHtml = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const nameText = escapeHtml(memory.name || "Anonim");
+      const userText = escapeHtml(message);
+      let aiText = escapeHtml(cleanReply);
+      const maxLen = 3800; // Telegram limit safety (4096), резерв для доп. текста
+      if (aiText.length > maxLen) aiText = aiText.slice(0, maxLen) + "…";
+
+      const logText = `👽 <b>Chat Log</b>\n👤 ${nameText}: ${userText}\n🤖 AI: ${aiText}`;
+      context.waitUntil(fetch(`https://api.telegram.org/bot${env.TELEGRAM_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text: logText, parse_mode: "HTML" })
+      }).catch(e => console.error("TG Log Error:", e)));
+    }
+
+    // ==========================================================================================
+    // 9. ОТВЕТ КЛИЕНТУ
+    // ==========================================================================================
+    return new Response(JSON.stringify({
+      reply: cleanReply,
+      saveName: memory.name,
+      saveAge: memory.age
+    }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+}
+
+
+
+
+
+

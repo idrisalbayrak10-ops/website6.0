@@ -1,0 +1,71 @@
+/* White Theme Overrides for Cart Page */
+
+/* Белый фон только для области контента (header/footer остаются своими) */
+body, html {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Убираем голубые/полупрозрачные подложки только в блоках корзины */
+.cart-page,
+.cart-page *:not(button):not(.btn-primary):not(.btn-secondary):not(.whatsapp-btn),
+.cart-summary,
+.cart-summary *,
+.cart-item,
+.cart-item *,
+.cart-total-row,
+.shipping-estimate,
+.shipping-estimate *,
+.shipping-estimate form,
+.chart-payment-bar,
+.payment-icons,
+.payment-icons-link {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Все надписи в области корзины делаем черными */
+.cart-page,
+.cart-page * {
+  color: #000000 !important;
+}
+
+/* Поля ввода в корзине */
+.cart-page input,
+.cart-page select,
+.cart-page textarea {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ccc !important;
+}
+
+/* Fix buttons that might be affected */
+.qty-control .qty-btn,
+.cart-item .cart-qty-controls button {
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+.qty-control .qty-btn:hover,
+.cart-item .cart-qty-controls button:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Payment icons container fix */
+.chart-payment-bar .payment-icons {
+  border: none !important;
+}
+
+/* Cookie modal if present */
+.cookie-modal {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ccc !important;
+}
+.cookie-header, .cookie-text, .cookie-link {
+    color: #000000 !important;
+}
