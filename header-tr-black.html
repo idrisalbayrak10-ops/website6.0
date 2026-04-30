@@ -9,26 +9,40 @@
       <a href="#" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
         <img src="/assets/images/albamenai.png" alt="AI assistant" width="32" height="32">
       </a>
-      <div class="alien-dropdown-container">
+      <div class="alien-dropdown-container" data-account-page="/account.html">
         <a href="#"
            class="alien-ghost"
            aria-label="Hesap menüsü"
            aria-controls="alienMenu"
            aria-expanded="false"
            aria-haspopup="true"
-           title="Giriş"
+           title="Hesap"
            onclick="toggleAlienMenu(event)">
-          <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
+          <img id="accountAvatar" class="account-avatar" src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login" role="menuitem">Giriş Yap</a>
-          <button type="button"
-                  class="alien-menu-item alien-menu-google"
-                  onclick="login({ closeMenu: true, source: 'header-menu' })"
-                  aria-label="Google ile Giriş Yap"
-                  role="menuitem">Google ile Giriş Yap</button>
-          <a href="#" class="alien-menu-item open-signup" role="menuitem">Kayıt Ol</a>
-          <div id="user" class="worker-auth-user" aria-live="polite"></div>
+          <div class="alien-auth-logged-out">
+            <a href="#" class="alien-menu-item open-login" role="menuitem">Giriş Yap</a>
+            <button type="button"
+                    class="alien-menu-item alien-menu-google"
+                    onclick="login({ closeMenu: true, source: 'header-menu' })"
+                    aria-label="Google ile Giriş Yap"
+                    role="menuitem">Google ile Giriş Yap</button>
+            <a href="#" class="alien-menu-item open-signup" role="menuitem">Kayıt Ol</a>
+          </div>
+          <div class="alien-auth-logged-in" hidden>
+            <a id="accountMenuLink"
+               href="/account.html"
+               data-account-page="/account.html"
+               class="alien-menu-item alien-menu-account"
+               role="menuitem">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="" width="28" height="28">
+              <span id="accountMenuName" data-default-text="Hesap">Hesap</span>
+            </a>
+            <button type="button"
+                    class="alien-menu-item"
+                    onclick="logout()">Çıkış Yap</button>
+          </div>
         </div>
       </div>
     </div>

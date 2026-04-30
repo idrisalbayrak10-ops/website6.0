@@ -490,3 +490,25 @@ html.product-text-black .dropdown-menu button:hover {
     color: #111827 !important;
   }
 }
+
+.alien-auth-logged-out[hidden],
+.alien-auth-logged-in[hidden] {
+  display: none !important;
+}
+
+.alien-menu-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alien-menu-account img,
+.alien-dropdown-container .account-avatar {
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.alien-menu-account img {
+  width: 28px;
+  height: 28px;
+}

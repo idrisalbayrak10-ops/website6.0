@@ -27,11 +27,13 @@ async function checkUser() {
       console.log("Logged in:", user);
 
       setUserText("Hello " + (user.name || user.email || "user"));
+      updateAuthMenu(user);
       closeAuthUi({ closeModal: true, closeMenu: true });
       restorePendingReturnUrl();
     } else {
       console.log("Not logged in (status: " + res.status + ")");
       setUserText("");
+      updateAuthMenu(null);
     }
   } catch (error) {
     // Silently handle errors (CORS, timeout, network) without blocking page
@@ -43,6 +45,7 @@ async function checkUser() {
       console.debug("Auth check failed:", error.message);
     }
     setUserText("");
+    updateAuthMenu(null);
   }
 }
 
@@ -62,6 +65,43 @@ function setUserText(text) {
   userElements.forEach((element) => {
     element.innerText = text;
   });
+}
+
+function updateAuthMenu(user) {
+  const loggedOutPanel = document.querySelector('.alien-auth-logged-out');
+  const loggedInPanel = document.querySelector('.alien-auth-logged-in');
+  const accountLink = document.getElementById('accountMenuLink');
+  const accountAvatar = document.getElementById('accountMenuAvatar');
+  const accountName = document.getElementById('accountMenuName');
+  const triggerAvatar = document.getElementById('accountAvatar');
+  const trigger = document.querySelector('.alien-ghost');
+  const isLoggedIn = user && (user.name || user.email || user.avatar);
+
+  if (loggedOutPanel && loggedInPanel) {
+    loggedOutPanel.hidden = !isLoggedIn ? false : true;
+    loggedInPanel.hidden = isLoggedIn ? false : true;
+  }
+
+  if (accountLink) {
+    const page = accountLink.dataset.accountPage || accountLink.href;
+    accountLink.href = page;
+  }
+
+  if (accountAvatar) {
+    accountAvatar.src = (user && user.avatar) ? user.avatar : '/assets/icons/alien.png';
+  }
+
+  if (accountName) {
+    accountName.textContent = (user && (user.name || user.email)) ? (user.name || user.email) : accountName.dataset.defaultText || 'Account';
+  }
+
+  if (triggerAvatar) {
+    triggerAvatar.src = (user && user.avatar) ? user.avatar : '/assets/icons/alien.png';
+    triggerAvatar.classList.toggle('account-avatar', Boolean(isLoggedIn));
+    if (trigger) {
+      trigger.setAttribute('title', isLoggedIn ? 'Account: ' + (user.name || user.email) : 'Account');
+    }
+  }
 }
 
 function persistAuthState(source) {
@@ -120,8 +160,21 @@ function closeAuthUi(options = {}) {
   }
 }
 
+function logout() {
+  try {
+    localStorage.removeItem('user');
+    localStorage.removeItem('albamen_session_id');
+  } catch (e) {
+    console.warn('Unable to clear local auth state', e);
+  }
+  document.cookie = 'user_id=; Max-Age=0; path=/;';
+  document.cookie = 'albamen_session_id=; Max-Age=0; path=/;';
+  window.location.reload();
+}
+
 window.login = login;
 window.checkUser = checkUser;
+window.logout = logout;
 
 // Defer checkUser() to prevent blocking page load
 // Only attempt if header contains auth user element

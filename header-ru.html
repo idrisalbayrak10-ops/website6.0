@@ -9,26 +9,40 @@
       <a href="#" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
         <img src="/assets/images/albamenai.png" alt="AI assistant" width="32" height="32">
       </a>
-      <div class="alien-dropdown-container">
+      <div class="alien-dropdown-container" data-account-page="/rus/account.html">
         <a href="#"
            class="alien-ghost"
            aria-label="Меню аккаунта"
            aria-controls="alienMenu"
            aria-expanded="false"
            aria-haspopup="true"
-           title="Войти"
+           title="Аккаунт"
            onclick="toggleAlienMenu(event)">
-          <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
+          <img id="accountAvatar" class="account-avatar" src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login" role="menuitem">Войти</a>
-          <button type="button"
-                  class="alien-menu-item alien-menu-google"
-                  onclick="login({ closeMenu: true, source: 'header-menu' })"
-                  aria-label="Войти через Google"
-                  role="menuitem">Войти через Google</button>
-          <a href="#" class="alien-menu-item open-signup" role="menuitem">Регистрация</a>
-          <div id="user" class="worker-auth-user" aria-live="polite"></div>
+          <div class="alien-auth-logged-out">
+            <a href="#" class="alien-menu-item open-login" role="menuitem">Войти</a>
+            <button type="button"
+                    class="alien-menu-item alien-menu-google"
+                    onclick="login({ closeMenu: true, source: 'header-menu' })"
+                    aria-label="Войти через Google"
+                    role="menuitem">Войти через Google</button>
+            <a href="#" class="alien-menu-item open-signup" role="menuitem">Регистрация</a>
+          </div>
+          <div class="alien-auth-logged-in" hidden>
+            <a id="accountMenuLink"
+               href="/rus/account.html"
+               data-account-page="/rus/account.html"
+               class="alien-menu-item alien-menu-account"
+               role="menuitem">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="" width="28" height="28">
+              <span id="accountMenuName" data-default-text="Аккаунт">Аккаунт</span>
+            </a>
+            <button type="button"
+                    class="alien-menu-item"
+                    onclick="logout()">Выйти</button>
+          </div>
         </div>
       </div>
     </div>
