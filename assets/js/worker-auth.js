@@ -1,5 +1,7 @@
-const WORKER_AUTH_URL = "https://albaspace-api.nncdecdgc.workers.dev/auth/google";
-const WORKER_ME_URL = "https://albaspace-api.nncdecdgc.workers.dev/me";
+const WORKER_BASE_URL = "https://albaspace-api.nncdecdgc.workers.dev";
+const WORKER_AUTH_URL = `${WORKER_BASE_URL}/auth/google`;
+const WORKER_ME_URL = `${WORKER_BASE_URL}/me`;
+const WORKER_PROFILE_URL = `${WORKER_BASE_URL}/profile`;
 const AUTH_RETURN_KEY = "albaspace_auth_return_to";
 const AUTH_SOURCE_KEY = "albaspace_auth_source";
 
@@ -159,6 +161,44 @@ function closeAuthUi(options = {}) {
     document.body.style.overflow = "";
   }
 }
+
+async function saveAccountProfile(data) {
+  const result = {
+    ok: false,
+    serverSaved: false,
+    message: "Unable to save profile.",
+    error: null
+  };
+
+  try {
+    const response = await fetch(WORKER_PROFILE_URL, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => null);
+      result.message = body?.error || `Server error: ${response.status}`;
+      result.error = body || { status: response.status };
+      return result;
+    }
+
+    result.ok = true;
+    result.serverSaved = true;
+    result.message = 'Profile saved successfully.';
+    return result;
+  } catch (error) {
+    result.error = error;
+    result.message = 'Unable to contact server. Your profile was saved locally.';
+    return result;
+  }
+}
+
+window.saveAccountProfile = saveAccountProfile;
 
 function logout() {
   try {

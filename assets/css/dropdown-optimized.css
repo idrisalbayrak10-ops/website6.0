@@ -471,6 +471,116 @@ html.product-text-black .dropdown-menu button:hover {
   color: #111827 !important;
 }
 
+/* =================================================================== */
+/* Alien account menu — styles to match screenshot (stacked blue buttons) */
+/* =================================================================== */
+
+.alien-dropdown-container {
+  position: relative;
+}
+
+.alien-dropdown-container .alien-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 999px;
+}
+
+.alien-dropdown-container .account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.alien-dropdown-container .alien-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(2,6,23,0.98), rgba(6,12,30,0.98));
+  border: 1px solid rgba(0,194,255,0.12);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6), 0 0 26px rgba(0,194,255,0.04);
+  border-radius: 12px;
+  z-index: 2150;
+}
+
+.alien-menu .alien-menu-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  color: #e6f7fb;
+  background: transparent;
+  border: none;
+}
+
+.alien-auth-logged-out .alien-menu-item {
+  background: linear-gradient(180deg, #00d4ff, #00a8e6) !important;
+  color: #021024 !important;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0,194,255,0.12);
+}
+
+.alien-auth-logged-out .alien-menu-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alien-auth-logged-in {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alien-auth-logged-in .alien-menu-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #e6f7fb;
+}
+
+.alien-menu-account img {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+.alien-auth-logged-in .alien-menu-item {
+  background: transparent !important;
+  color: #e6f7fb !important;
+}
+
+.alien-menu .alien-menu-item:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1023px) {
+  .alien-dropdown-container .alien-menu {
+    right: 12px;
+    left: auto;
+    min-width: min(92vw, 360px);
+  }
+  .alien-auth-logged-out .alien-menu-item {
+    width: 100%;
+  }
+}
+
 @media (max-width: 1023px) {
   html.product-text-black .dropdown-menu {
     background: #ffffff !important;

@@ -56,21 +56,75 @@
     </section>
   </main>
   <script>
+    const API_BASE = "https://albaspace-api.nncdecdgc.workers.dev";
     const form = document.getElementById('accountForm');
     const message = document.getElementById('accountMessage');
-    form.addEventListener('submit', function (event) {
+
+    async function loadProfileData() {
+      const saved = localStorage.getItem('albaspace_account_profile');
+      let profile = {
+        name: '',
+        email: '',
+        favorite_experience: '',
+        notes: ''
+      };
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          profile = { ...profile, ...parsed };
+        } catch (error) {
+          console.debug('Unable to parse stored profile', error);
+        }
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/me`, {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          profile.name = data.name || profile.name;
+          profile.email = data.email || profile.email;
+          if (data.profile) {
+            profile.favorite_experience = data.profile.favorite_experience || profile.favorite_experience;
+            profile.notes = data.profile.notes || profile.notes;
+          }
+        }
+      } catch (error) {
+        console.debug('Unable to load remote profile', error);
+      }
+
+      document.getElementById('name').value = profile.name;
+      document.getElementById('email').value = profile.email;
+      document.getElementById('favorite').value = profile.favorite_experience;
+      document.getElementById('notes').value = profile.notes;
+    }
+
+    loadProfileData();
+
+    form.addEventListener('submit', async function (event) {
       event.preventDefault();
       const data = {
         name: document.getElementById('name').value.trim(),
         email: document.getElementById('email').value.trim(),
-        favorite: document.getElementById('favorite').value.trim(),
+        favorite_experience: document.getElementById('favorite').value.trim(),
         notes: document.getElementById('notes').value.trim()
       };
       try {
         localStorage.setItem('albaspace_account_profile', JSON.stringify(data));
-        message.textContent = 'Account information saved.';
       } catch (err) {
-        message.textContent = 'Unable to save details. Please try again.';
+        // ignore local save errors
+      }
+
+      if (typeof window.saveAccountProfile === 'function') {
+        const result = await window.saveAccountProfile(data);
+        message.textContent = result.message;
+        if (!result.ok && !result.serverSaved) {
+          message.textContent = 'Unable to save on server, but data stored locally.';
+        }
+      } else {
+        message.textContent = 'Account information saved locally.';
       }
     });
   </script>

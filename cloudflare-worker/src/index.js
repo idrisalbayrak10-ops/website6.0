@@ -36,7 +36,7 @@ async function handleRequest(request, env) {
       {
         ok: true,
         service: "albaspace-auth-worker",
-        routes: ["/auth/google", "/auth/google/callback", "/me", "/logout"]
+        routes: ["/auth/google", "/auth/google/callback", "/me", "/profile", "/logout"]
       },
       200,
       corsHeaders
@@ -53,6 +53,10 @@ async function handleRequest(request, env) {
 
   if (url.pathname === "/me" && request.method === "GET") {
     return getCurrentUser(request, env, corsHeaders);
+  }
+
+  if (url.pathname === "/profile" && request.method === "POST") {
+    return saveUserProfile(request, env, corsHeaders);
   }
 
   if (url.pathname === "/logout" && (request.method === "POST" || request.method === "GET")) {
@@ -224,7 +228,55 @@ async function getCurrentUser(request, env, corsHeaders) {
       id: session.id,
       email: session.email,
       name: session.name,
-      picture: session.picture
+      picture: session.picture,
+      profile: {
+        favorite_experience: session.favorite_experience || null,
+        notes: session.notes || null
+      }
+    },
+    200,
+    corsHeaders
+  );
+}
+
+async function saveUserProfile(request, env, corsHeaders) {
+  assertRequiredEnv(env, ["DB"]);
+
+  const session = await getSessionUser(request, env);
+  if (!session) {
+    return json({ error: "Not logged in" }, 401, corsHeaders);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return json({ error: "Invalid JSON body" }, 400, corsHeaders);
+  }
+
+  const favoriteExperience = String(body.favorite_experience || body.favorite || "").trim();
+  const notes = String(body.notes || "").trim();
+  const now = Math.floor(Date.now() / 1000);
+  const profileId = session.id;
+
+  await env.DB.prepare(
+    `INSERT INTO profiles (id, user_id, favorite_experience, notes, created_at, updated_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?5)
+     ON CONFLICT(id) DO UPDATE SET
+       favorite_experience = excluded.favorite_experience,
+       notes = excluded.notes,
+       updated_at = excluded.updated_at`
+  )
+    .bind(profileId, session.id, favoriteExperience, notes, now)
+    .run();
+
+  return json(
+    {
+      ok: true,
+      profile: {
+        favorite_experience: favoriteExperience,
+        notes
+      }
     },
     200,
     corsHeaders
@@ -267,9 +319,11 @@ async function getSessionUser(request, env) {
 
   const now = Math.floor(Date.now() / 1000);
   const result = await env.DB.prepare(
-    `SELECT users.id, users.email, users.name, users.picture
+    `SELECT users.id, users.email, users.name, users.picture,
+            profiles.favorite_experience, profiles.notes
      FROM sessions
      INNER JOIN users ON users.id = sessions.user_id
+     LEFT JOIN profiles ON profiles.user_id = users.id
      WHERE sessions.id = ?1 AND sessions.expires_at > ?2
      LIMIT 1`
   )
