@@ -1,7 +1,7 @@
-/* Override to force black text on product pages (exclude signup modal) */
+/* Override to force black text on product pages (exclude signup modal and alienMenu) */
 /* Applied with high specificity and !important to beat existing styles */
 html.product-text-black body,
-html.product-text-black body *:not(.signup-modal-overlay):not(.signup-modal-overlay *) {
+html.product-text-black body *:not(.signup-modal-overlay):not(.signup-modal-overlay *):not(#alienMenu):not(#alienMenu *) {
   color: #000000 !important;
   fill: #000000 !important;
   stroke: #000000 !important;

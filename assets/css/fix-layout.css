@@ -667,89 +667,53 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* ===== ALIEN MENU CENTERING (NEW) ===== */
-.alien-dropdown-container {
-    position: relative !important;
-}
-
-.alien-ghost {
-    display: inline-flex !important;
-    transition: transform 0.25s ease, filter 0.25s ease !important;
-    will-change: transform;
-}
-
-.alien-ghost:hover,
-.alien-ghost:focus-visible {
-    transform: scale(1.1) !important;
-}
-
+/* ===== ALIEN MENU ===== */
 #alienMenu {
     position: absolute !important;
     top: calc(100% + 8px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 100000 !important;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32), 0 0 24px rgba(0, 191, 255, 0.14) !important;
-    min-width: 320px !important;
-    max-width: 480px !important;
-    background: rgba(2, 6, 23, 0.96) !important;
+    left: 0 !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(0,194,255,0.1) !important;
+    width: 200px !important;
+    text-align: center;
+    background: rgba(2, 6, 23, 0.98) !important;
     padding: 12px !important;
-    border-radius: 16px !important;
-    border: 1px solid rgba(0, 191, 255, 0.22) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(0, 191, 255, 0.3) !important;
     display: none !important;
-    gap: 10px;
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
+    grid-template-columns: 1fr;
+    gap: 6px;
 }
 
 #alienMenu:not([hidden]) {
-    display: flex !important;
+    display: grid !important;
 }
 
 #alienMenu .alien-menu-item {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-width: 110px !important;
-    padding: 12px 14px !important;
-    background-color: rgba(0, 191, 255, 0.18) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 12px !important;
+    background-color: #00BFFF !important; /* Deep Sky Blue */
     color: #ffffff !important;
     text-decoration: none !important;
-    border-radius: 999px !important;
+    border-radius: 6px !important;
     font-weight: 600 !important;
-    font-size: 13px !important;
-    letter-spacing: 0.02em !important;
-    transition: transform 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16) !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px rgba(0, 191, 255, 0.2) !important;
     text-align: center !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border: none !important;
     margin: 0 !important;
-    white-space: nowrap !important;
 }
 
 #alienMenu .alien-menu-item:hover,
-#alienMenu .alien-menu-item:focus-visible {
-    background-color: rgba(0, 191, 255, 0.32) !important;
-    box-shadow: 0 10px 20px rgba(0, 191, 255, 0.18) !important;
-    transform: translateY(-1px) scale(1.02) !important;
+#alienMenu .alien-menu-item:focus {
+    background-color: #009ACD !important; /* Darker Blue on hover */
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.6) !important;
+    transform: translateY(-2px) !important;
     outline: none !important;
-}
-
-#alienMenu .worker-auth-user {
-    min-width: 100px !important;
-    padding: 10px 14px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-radius: 999px !important;
-    color: #dbeafe !important;
-    font-size: 12px !important;
-    line-height: 1.4 !important;
-    text-align: center !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-#alienMenu .worker-auth-user:empty {
-    display: none !important;
 }
 
 /* Ensure social icons and langs are always flex row as requested */

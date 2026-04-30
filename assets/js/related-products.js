@@ -1,6 +1,6 @@
 // Product data
 const trProducts = [
-  { title: "Stanley Termos", price: "2400.00 TL", image: "/assets/images/stanley.png", link: "product-stanley.html" },
+  { title: "Stanley Termos", price: "2990.00 TL", image: "/assets/images/stanley.png", link: "product-stanley.html" },
   { title: "Teleskopla Dolunay Gözlemi Bileti", price: "400.00 TL", image: "/assets/images/albaspaceshop_eb477f8cc10d14b917f64623a461cf38.png", link: "product-teleskopla-dolunay.html" },
   { title: "T-Shirt", price: "630.00 TL", image: "/assets/images/shirt1.png", link: "product-shirt1.html" },
   { title: "Alba Space Tişört", price: "630.00 TL", image: "/assets/images/shirt.png", link: "product-shirt.html" },
@@ -12,7 +12,7 @@ const trProducts = [
 ];
 
 const enProducts = [
-  { title: "Stanley Thermos", price: "2400.00 TL", image: "/assets/images/stanley.png", link: "/eng/product-stanley.html" },
+  { title: "Stanley Thermos", price: "2990.00 TL", image: "/assets/images/stanley.png", link: "/eng/product-stanley.html" },
   { title: "Telescope Full Moon Ticket", price: "400.00 TL", image: "/assets/images/albaspaceshop_eb477f8cc10d14b917f64623a461cf38.png", link: "/eng/product-teleskopla-dolunay.html" },
   { title: "T-Shirt", price: "630.00 TL", image: "/assets/images/shirt1.png", link: "/eng/product-shirt1.html" },
   { title: "Alba Space Tişört", price: "630.00 TL", image: "/assets/images/shirt.png", link: "/eng/product-shirt.html" },
@@ -24,7 +24,7 @@ const enProducts = [
 ];
 
 const ruProducts = [
-  { title: "Термос Stanley", price: "2400.00 TL", image: "/assets/images/stanley.png", link: "/rus/product-stanley.html" },
+  { title: "Термос Stanley", price: "2990.00 TL", image: "/assets/images/stanley.png", link: "/rus/product-stanley.html" },
   { title: "Билет на наблюдение полнолуния", price: "400.00 TL", image: "/assets/images/albaspaceshop_eb477f8cc10d14b917f64623a461cf38.png", link: "/rus/product-teleskopla-dolunay.html" },
   { title: "Футболка", price: "630.00 TL", image: "/assets/images/shirt1.png", link: "/rus/product-shirt1.html" },
   { title: "Футболка Alba Space", price: "630.00 TL", image: "/assets/images/shirt.png", link: "/rus/product-shirt.html" },

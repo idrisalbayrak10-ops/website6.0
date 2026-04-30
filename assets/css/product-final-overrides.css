@@ -66,10 +66,10 @@ html.product-text-black .reveal::before {
   display: none !important;
 }
 
-/* Strong override: remove any background images/gradients inside main on product pages (exclude signup modal) */
-html.product-text-black main *:not(.signup-modal-overlay):not(.signup-modal-overlay *),
-html.product-text-black .product-grid *:not(.signup-modal-overlay):not(.signup-modal-overlay *),
-html.product-text-black .reveal *:not(.signup-modal-overlay):not(.signup-modal-overlay *) {
+/* Strong override: remove any background images/gradients inside main on product pages (exclude signup modal and alienMenu) */
+html.product-text-black main *:not(.signup-modal-overlay):not(.signup-modal-overlay *):not(#alienMenu):not(#alienMenu *),
+html.product-text-black .product-grid *:not(.signup-modal-overlay):not(.signup-modal-overlay *):not(#alienMenu):not(#alienMenu *),
+html.product-text-black .reveal *:not(.signup-modal-overlay):not(.signup-modal-overlay *):not(#alienMenu):not(#alienMenu *) {
   background-image: none !important;
   background: transparent !important;
 }
@@ -158,4 +158,3 @@ html.product-text-black .site-header *,
 html.product-text-black .footer * {
   background-color: transparent !important;
 }
-
