@@ -1,123 +1,59 @@
 <header class="site-header" role="banner">
   <div class="header-inner">
-
-    <!-- Left: logo icon + AI assistant + account -->
     <div class="logo-sub-icons">
       <a href="/eng/index.html" class="header-logo-icon" aria-label="Alba Space home page">
-        <img src="/assets/images/AlbaLogo.png" alt="Alba Space logo" width="32" height="32">
+        <img src="/assets/images/albalogo.png" alt="Alba Space logo" width="32" height="32">
       </a>
       <a href="#" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
         <img src="/assets/images/albamenai.png" alt="AI assistant" width="32" height="32">
       </a>
-      <div class="alien-dropdown-container" data-account-page="/eng/account.html">
-        <a href="#"
-           class="alien-ghost"
-           aria-label="Account menu"
-           aria-controls="alienMenu"
-           aria-expanded="false"
-           aria-haspopup="true"
-           title="Account"
-           onclick="toggleAlienMenu(event)">
-          <img id="accountAvatar" class="account-avatar" src="/assets/icons/alien.png" alt="Account" width="32" height="32">
+      <div class="alien-dropdown-container">
+        <a href="#" class="alien-ghost" onclick="toggleAlienMenu(event)">
+          <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <div class="alien-auth-logged-out">
-            <a href="#" class="alien-menu-item open-login" role="menuitem">Sign In</a>
-            <button type="button"
-                    class="alien-menu-item alien-menu-google"
-                    onclick="login({ closeMenu: true, source: 'header-menu' })"
-                    aria-label="Sign in with Google"
-                    role="menuitem">Sign in with Google</button>
-            <a href="#" class="alien-menu-item open-signup" role="menuitem">Sign Up</a>
-          </div>
-          <div class="alien-auth-logged-in" hidden>
-            <a id="accountMenuLink"
-               href="/eng/account.html"
-               data-account-page="/eng/account.html"
-               class="alien-menu-item alien-menu-account"
-               role="menuitem">
-              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="" width="28" height="28">
-              <span id="accountMenuName" data-default-text="Account">Account</span>
-            </a>
-            <button type="button"
-                    class="alien-menu-item"
-                    onclick="logout()">Logout</button>
-          </div>
+          <a href="#" class="alien-menu-item open-login">Sign In</a>
+          <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
+            Sign in with Google
+          </button>
+          <a href="#" class="alien-menu-item open-signup">Sign Up</a>
+          <div id="user" class="worker-auth-user"></div>
         </div>
       </div>
     </div>
 
-    <!-- Center: Alba Space wordmark logo -->
-    <a href="/eng/index.html" class="header-logo main-center-logo" aria-label="Alba Space">
+    <a href="/eng/index.html" class="header-logo main-center-logo">
       <img src="/assets/images/albaspace.png" alt="Alba Space" class="albaspace-img">
     </a>
 
-    <!-- Navigation -->
-    <nav class="main-nav" aria-label="Main navigation">
+    <nav class="main-nav">
       <div class="dropdown">
-        <a href="/eng/hizmetler.html" class="dropdown-trigger" aria-expanded="false">SERVICES</a>
-        <div class="dropdown-menu">
-          <a href="/eng/hizmetler.html">SERVICES</a>
-          <a href="https://albaspace.com.tr/hyperclub" target="_blank" rel="noopener">Hyper Club</a>
-        </div>
+        <a href="/eng/hizmetler.html" class="dropdown-trigger">SERVICES</a>
+        <div class="dropdown-menu"><a href="/eng/hizmetler.html">SERVICES</a><a href="https://albaspace.com.tr/hyperclub" target="_blank">Hyper Club</a></div>
       </div>
       <a href="/eng/shop.html">SHOP</a>
       <div class="dropdown">
-        <a href="/eng/albamen.html" class="dropdown-trigger" aria-expanded="false">ALBAMAN</a>
-        <div class="dropdown-menu">
-          <a href="/eng/albamen.html">ALBAMAN</a>
-          <a href="/eng/atlas.html">ATLAS</a>
-        </div>
+        <a href="/eng/albamen.html" class="dropdown-trigger">ALBAMAN</a>
+        <div class="dropdown-menu"><a href="/eng/albamen.html">ALBAMAN</a><a href="/eng/atlas.html">ATLAS</a></div>
       </div>
       <div class="dropdown">
-        <a href="/eng/hakkimizda.html" class="dropdown-trigger" aria-expanded="false">ABOUT US</a>
-        <div class="dropdown-menu">
-          <a href="/eng/hakkimizda.html">ABOUT US</a>
-          <a href="/eng/basindabiz.html">PRESS</a>
-          <a href="/eng/galeri.html">GALLERY</a>
-          <a href="/eng/iletisim.html">CONTACT</a>
-        </div>
+        <a href="/eng/hakkimizda.html" class="dropdown-trigger">ABOUT US</a>
+        <div class="dropdown-menu"><a href="/eng/hakkimizda.html">ABOUT US</a><a href="/eng/basindabiz.html">PRESS</a></div>
       </div>
     </nav>
 
-    <!-- Right: social icons + language + cart -->
     <div class="header-social">
-      <div class="social-row" aria-label="Social media">
-        <a href="https://www.instagram.com/albaspace_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-track="inst">
-          <img src="/assets/icons/inst.png" alt="Instagram" loading="lazy">
-        </a>
-        <a href="https://www.linkedin.com/in/idrisalbayrak/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-          <img src="/assets/icons/linkdin.png" alt="LinkedIn" loading="lazy">
-        </a>
-        <a href="https://wa.me/905387781018" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" data-track="whatsapp">
-          <img src="/assets/icons/watsupp.png" alt="WhatsApp" loading="lazy">
-        </a>
-        <a href="https://www.youtube.com/@AlbaSpaceTr" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-          <img src="/assets/icons/youtube.png" alt="YouTube" loading="lazy">
-        </a>
+      <div class="social-row">
+        <a href="https://www.instagram.com/albaspace_/" target="_blank"><img src="/assets/icons/inst.png"></a>
+        <a href="https://wa.me/905387781018" target="_blank"><img src="/assets/icons/watsupp.png"></a>
       </div>
-
-      <!-- Language + cart -->
       <div class="top-lang-switch">
-        <a href="/index.html"     data-lang="tr" class="lang-flag" aria-label="Türkçe">
-          <img src="/assets/icons/flag-tr.png"  alt="Türkçe"  width="24" height="16" loading="lazy">
-        </a>
-        <a href="/eng/index.html" data-lang="en" class="lang-flag" aria-label="English">
-          <img src="/assets/icons/flag-us.png"  alt="English" width="24" height="16" loading="lazy">
-        </a>
-        <a href="/rus/index.html" data-lang="ru" class="lang-flag" aria-label="Русский">
-          <img src="/assets/icons/flag-rus.png" alt="Русский" width="24" height="16" loading="lazy">
-        </a>
-
-        <a href="/eng/cart.html" class="header-cart-link" aria-label="Cart">
-          <span class="header-cart-icon" aria-hidden="true">
-            <img src="/assets/icons/chart.png" alt="" width="28" height="28">
-            <span class="header-cart-count" data-cart-count aria-label="Cart count">0</span>
-          </span>
-        </a>
+        <a href="/index.html"><img src="/assets/icons/flag-tr.png" width="24"></a>
+        <a href="/eng/index.html"><img src="/assets/icons/flag-us.png" width="24"></a>
+        <a href="/rus/index.html"><img src="/assets/icons/flag-rus.png" width="24"></a>
+        <a href="/eng/cart.html" class="header-cart-link"><span class="header-cart-icon"><img src="/assets/icons/chart.png" width="28"><span class="header-cart-count" data-cart-count>0</span></span></a>
       </div>
     </div>
-
   </div>
 </header>
 
@@ -138,35 +74,18 @@
   function toggleAlienMenu(e) {
     e.preventDefault();
     const menu = document.getElementById('alienMenu');
-    const trigger = document.querySelector('.alien-ghost');
-    const isHidden = menu.hasAttribute('hidden');
-    if (isHidden) {
-      menu.removeAttribute('hidden');
-      trigger.setAttribute('aria-expanded', 'true');
-    } else {
-      menu.setAttribute('hidden', '');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
+    if (menu.hasAttribute('hidden')) { menu.removeAttribute('hidden'); } else { menu.setAttribute('hidden', ''); }
   }
-
-  function closeAlienMenu() {
-    const menu = document.getElementById('alienMenu');
-    const trigger = document.querySelector('.alien-ghost');
-    if (menu) menu.setAttribute('hidden', '');
-    if (trigger) trigger.setAttribute('aria-expanded', 'false');
-  }
-
+  window.login = function(options) {
+    if (options && options.closeMenu) document.getElementById('alienMenu').setAttribute('hidden', '');
+    const currentUrl = window.location.href;
+    window.location.href = `https://albaspace-api.nncdecdgc.workers.dev/auth/google?from=${encodeURIComponent(currentUrl)}`;
+  };
   document.addEventListener('click', function (e) {
     const container = document.querySelector('.alien-dropdown-container');
-    if (container && !container.contains(e.target)) closeAlienMenu();
+    if (container && !container.contains(e.target)) document.getElementById('alienMenu').setAttribute('hidden', '');
   });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeAlienMenu();
-  });
-
   window.toggleAlienMenu = toggleAlienMenu;
-}());
+})();
 </script>
-
 <div data-include="/assets/includes/signup-modal.html"></div>
