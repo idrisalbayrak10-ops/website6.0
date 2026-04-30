@@ -138,11 +138,15 @@
         </a>
       </div>
     </div>
-
   </div>
 </header>
 
+<!-- С этого места (строка 127) начинаются исправления -->
 <link rel="stylesheet" href="/assets/css/dropdown-optimized.css">
+<!-- Добавил эти 3 строки для исправления 404 ошибок из консоли -->
+<link rel="stylesheet" href="/assets/css/model-nav-overrides.css">
+<link rel="stylesheet" href="/assets/css/fix-layout.css">
+<link rel="stylesheet" href="/assets/css/content-z-index-fix.css">
 
 <script src="/assets/js/menu-toggle.js" defer></script>
 <script src="/assets/js/cart.js" defer></script>
@@ -155,41 +159,39 @@
 <script>
 (function () {
   function toggleAlienMenu(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const menu = document.getElementById('alienMenu');
     const trigger = document.querySelector('.alien-ghost');
-
-    if (menu.hasAttribute('hidden')) {
-      menu.removeAttribute('hidden');
-      trigger.setAttribute('aria-expanded', 'true');
-    } else {
-      menu.setAttribute('hidden', '');
-      trigger.setAttribute('aria-expanded', 'false');
+    
+    if (menu && trigger) {
+      if (menu.hasAttribute('hidden')) {
+        menu.removeAttribute('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.setAttribute('hidden', '');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
     }
   }
 
   document.addEventListener('click', function (e) {
     const container = document.querySelector('.alien-dropdown-container');
-    if (container && !container.contains(e.target)) {
-      document.getElementById('alienMenu').setAttribute('hidden', '');
+    const menu = document.getElementById('alienMenu');
+    if (container && menu && !container.contains(e.target)) {
+      menu.setAttribute('hidden', '');
     }
   });
 
   window.toggleAlienMenu = toggleAlienMenu;
 
-  // --- НОВАЯ ФУНКЦИЯ ДЛЯ ЛОГИНА ЧЕРЕЗ GOOGLE ---
+  // --- ФУНКЦИЯ ДЛЯ ЛОГИНА ЧЕРЕЗ GOOGLE ---
   window.login = function(options) {
-    // Если нужно закрыть меню перед редиректом
     if (options && options.closeMenu) {
-      document.getElementById('alienMenu').setAttribute('hidden', '');
+      const menu = document.getElementById('alienMenu');
+      if (menu) menu.setAttribute('hidden', '');
     }
-    
-    // Получаем текущий URL страницы, на которой находится пользователь
     const currentUrl = window.location.href;
-    
-    // Отправляем в Worker с указанием адреса возврата
     window.location.href = `https://albaspace-api.nncdecdgc.workers.dev/auth/google?from=${encodeURIComponent(currentUrl)}`;
   };
-
 })();
 </script>

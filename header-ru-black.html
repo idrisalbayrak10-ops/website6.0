@@ -4,20 +4,28 @@
       <a href="/rus/index.html" class="header-logo-icon" aria-label="Главная страница Alba Space">
         <img src="/assets/images/albalogo.png" alt="Alba Space logo" width="32" height="32">
       </a>
-      <a href="#" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
+      <a href="javascript:void(0);" class="ai-widget-toggle" aria-label="AI assistant" title="AI">
         <img src="/assets/images/albamenai.png" alt="AI assistant" width="32" height="32">
       </a>
       <div class="alien-dropdown-container">
-        <a href="#" class="alien-ghost" aria-label="Меню аккаунта" onclick="toggleAlienMenu(event)">
+        <a href="javascript:void(0);" class="alien-ghost" aria-label="Меню аккаунта" onclick="toggleAlienMenu(event)">
           <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login" role="menuitem">Войти</a>
-          <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })" role="menuitem">
-            Войти через Google
-          </button>
-          <a href="#" class="alien-menu-item open-signup" role="menuitem">Регистрация</a>
-          <div id="user" class="worker-auth-user" aria-live="polite"></div>
+          <div class="alien-auth-logged-out">
+            <a href="javascript:void(0);" class="alien-menu-item open-login" role="menuitem">Войти</a>
+            <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })" role="menuitem">
+              Войти через Google
+            </button>
+            <a href="javascript:void(0);" class="alien-menu-item open-signup" role="menuitem">Регистрация</a>
+          </div>
+          <div class="alien-auth-logged-in" hidden>
+             <a id="accountMenuLink" href="/account.html" class="alien-menu-item alien-menu-account" role="menuitem">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="" width="28" height="28">
+              <span id="accountMenuName">Аккаунт</span>
+            </a>
+            <button type="button" class="alien-menu-item" onclick="logout()">Выйти</button>
+          </div>
         </div>
       </div>
     </div>
@@ -31,7 +39,7 @@
         <a href="/rus/hizmetler.html" class="dropdown-trigger">УСЛУГИ</a>
         <div class="dropdown-menu">
           <a href="/rus/hizmetler.html">УСЛУГИ</a>
-          <a href="https://albaspace.com.tr/hyperclub" target="_blank" rel="noopener">Hyper Club</a>
+          <a href="https://albaspace.com.tr/hyperclub" target="_blank">Hyper Club</a>
         </div>
       </div>
       <a href="/rus/shop.html">МАГАЗИН</a>
@@ -72,9 +80,9 @@
 
 <link rel="stylesheet" href="/assets/css/dropdown-optimized.css">
 <link rel="stylesheet" href="/assets/css/model-nav-overrides.css">
-<link rel="stylesheet" href="/assets/css/remove-blog-overlay.css">
 <link rel="stylesheet" href="/assets/css/fix-layout.css">
 <link rel="stylesheet" href="/assets/css/content-z-index-fix.css">
+
 <script src="/assets/js/menu-toggle.js" defer></script>
 <script src="/assets/js/cart.js" defer></script>
 <script src="/assets/js/lang-switch.js" defer></script>
@@ -82,23 +90,40 @@
 <script src="/assets/js/model-nav-loader.js" defer></script>
 <script src="/assets/js/worker-auth.js" defer></script>
 <script src="/assets/js/mobile-header-cart.js" defer></script>
+
 <script>
 (function () {
-  function toggleAlienMenu(e) {
-    e.preventDefault();
+  window.toggleAlienMenu = function(e) {
+    if (e) e.preventDefault();
     const menu = document.getElementById('alienMenu');
-    if (menu.hasAttribute('hidden')) { menu.removeAttribute('hidden'); } else { menu.setAttribute('hidden', ''); }
-  }
+    const trigger = document.querySelector('.alien-ghost');
+    if (menu && trigger) {
+      if (menu.hasAttribute('hidden')) {
+        menu.removeAttribute('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.setAttribute('hidden', '');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    }
+  };
+
+  document.addEventListener('click', function (e) {
+    const container = document.querySelector('.alien-dropdown-container');
+    const menu = document.getElementById('alienMenu');
+    if (container && menu && !container.contains(e.target)) {
+      menu.setAttribute('hidden', '');
+    }
+  });
+
   window.login = function(options) {
-    if (options && options.closeMenu) document.getElementById('alienMenu').setAttribute('hidden', '');
+    if (options && options.closeMenu) {
+      const menu = document.getElementById('alienMenu');
+      if (menu) menu.setAttribute('hidden', '');
+    }
     const currentUrl = window.location.href;
     window.location.href = `https://albaspace-api.nncdecdgc.workers.dev/auth/google?from=${encodeURIComponent(currentUrl)}`;
   };
-  document.addEventListener('click', function (e) {
-    const container = document.querySelector('.alien-dropdown-container');
-    if (container && !container.contains(e.target)) document.getElementById('alienMenu').setAttribute('hidden', '');
-  });
-  window.toggleAlienMenu = toggleAlienMenu;
 })();
 </script>
 <div data-include="/assets/includes/signup-modal.html"></div>
