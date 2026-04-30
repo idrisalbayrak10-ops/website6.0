@@ -200,4 +200,7 @@
   } else {
     requestAnimationFrame(init);
   }
+
+  // Export init function for dynamic header loading
+  window.initDropdowns = init;
 })();

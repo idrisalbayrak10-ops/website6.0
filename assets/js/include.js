@@ -227,6 +227,8 @@ runAfterDomReady(() => {
             ensurePreloaderScript();
             ensureModelPreloader();
             ensureModelNavLoader();
+            // Re-initialize dropdowns after dynamic header insertion
+            if (window.initDropdowns) window.initDropdowns();
           }
           if (url.includes("footer-")) {
             enhanceFooter(el);
