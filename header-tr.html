@@ -42,7 +42,7 @@
             </button>
 
             <a href="javascript:void(0);" class="alien-menu-item open-signup" role="menuitem">
-              Kayıt Ol
+              Kayııt Ol
             </a>
           </div>
 
@@ -176,5 +176,20 @@
   });
 
   window.toggleAlienMenu = toggleAlienMenu;
+
+  // --- НОВАЯ ФУНКЦИЯ ДЛЯ ЛОГИНА ЧЕРЕЗ GOOGLE ---
+  window.login = function(options) {
+    // Если нужно закрыть меню перед редиректом
+    if (options && options.closeMenu) {
+      document.getElementById('alienMenu').setAttribute('hidden', '');
+    }
+    
+    // Получаем текущий URL страницы, на которой находится пользователь
+    const currentUrl = window.location.href;
+    
+    // Отправляем в Worker с указанием адреса возврата
+    window.location.href = `https://albaspace-api.nncdecdgc.workers.dev/auth/google?from=${encodeURIComponent(currentUrl)}`;
+  };
+
 })();
 </script>
