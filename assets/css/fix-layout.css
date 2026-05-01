@@ -462,7 +462,7 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        order: -1 !important; /* Ensure it appears first */
+        order: 0 !important; /* Reset order to default */
         margin: 0 !important;
         padding: 0 !important;
     }
