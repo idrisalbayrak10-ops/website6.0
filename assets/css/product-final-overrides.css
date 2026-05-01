@@ -166,6 +166,19 @@ html.product-text-black .footer * {
    This file is loaded last (footer) so rules win over earlier !important.
    ============================================================ */
 @media (max-width: 1023px) {
+  /* Ensure 4-column horizontal grid on mobile for all dropdown menus */
+  .dropdown-menu,
+  .header-inner .main-nav .dropdown-menu {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(95vw, 520px) !important;
+    max-width: 95vw !important;
+  }
+
   /* Neutralize any pseudo-element transparency that may tint the menu */
   .dropdown.active .dropdown-menu::before,
   .dropdown.active .dropdown-menu::after,

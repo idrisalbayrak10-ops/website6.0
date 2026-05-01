@@ -117,12 +117,18 @@ canvas, iframe {
 
 @media (max-width: 1023px) {
   /* Mobile dropdown should use fixed positioning to escape any containers */
-  .dropdown-menu {
+  .dropdown-menu,
+  .header-inner .main-nav .dropdown-menu {
     position: fixed !important;
     z-index: 999999 !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) !important;
+    gap: 10px !important;
+    width: min(95vw, 520px) !important;
+    max-width: 95vw !important;
   }
   
   /* Mobile overlay for dropdown - REMOVED
