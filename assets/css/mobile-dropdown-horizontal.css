@@ -5,7 +5,9 @@
 @media (max-width: 1023px) {
   .dropdown-menu {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    grid-auto-flow: row !important;
     justify-items: center !important;
     align-items: stretch !important;
     gap: 10px !important;
