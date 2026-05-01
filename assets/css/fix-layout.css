@@ -443,32 +443,42 @@
         order: 2 !important; /* Lang second */
     }
 
-    /* Move cart icon to logo icons on mobile */
+    /* Move cart icon to logo icons on mobile (hide original on right) */
     .header-social .top-lang-switch .header-cart-link {
-        display: none !important; /* Hide from lang switch on mobile */
+        display: none !important;
     }
 
+    /* Ensure logo icons area can host the cart on the left */
     .logo-sub-icons {
         position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
     }
 
-    /* Ensure cloned cart is shown only in the left logo group on mobile */
+    /* Hide right-side cart in header-social on mobile */
     .header-cart-link {
-        display: none !important; /* Hide in header-social on mobile */
+        display: none !important;
     }
 
+    /* Styles for the cloned mobile cart placed in the logo area */
+    .logo-sub-icons .header-cart-link.mobile-positioned,
     .mobile-cart-icon {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        margin-left: 0 !important;
-    }
-
-    .header-cart-link.mobile-positioned {
-        display: flex !important;
-        order: -1 !important;
+        order: 0 !important;
         margin-right: 8px !important;
         margin-left: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Match the cart icon size to the Alba logo (default to 32x32) */
+    .logo-sub-icons .header-cart-link.mobile-positioned img,
+    .mobile-cart-icon img {
+        width: 32px !important;
+        height: 32px !important;
+        display: block !important;
     }
 
     /* 2. SECOND LINE: Navigation */

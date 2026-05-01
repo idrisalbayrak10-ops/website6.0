@@ -323,10 +323,10 @@
     width: min(94vw, 420px);
     max-width: 420px;
     max-height: 72vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
       background: rgba(0, 0, 0, 1);
       border-radius: 18px;

@@ -25,11 +25,29 @@ function repositionCartIconOnMobile() {
         cartClone.style.alignItems = 'center';
         cartClone.style.justifyContent = 'center';
         cartClone.style.marginLeft = '0';
-        
-        // Insert as the first item in the logo icons area for top-left placement
-        logoSubIcons.insertBefore(cartClone, logoSubIcons.firstChild);
-        
-        // Hide original cart
+
+        // Prefer inserting directly to the left of the Alba logo image
+        const headerLogoIcon = logoSubIcons.querySelector('.header-logo-icon');
+        if (headerLogoIcon) {
+          // Adjust cloned cart image to match logo image dimensions when possible
+          const logoImg = headerLogoIcon.querySelector('img');
+          const cartImg = cartClone.querySelector('img');
+          if (logoImg && cartImg) {
+            const w = logoImg.getAttribute('width') || logoImg.width || 32;
+            const h = logoImg.getAttribute('height') || logoImg.height || 32;
+            cartImg.setAttribute('width', w);
+            cartImg.setAttribute('height', h);
+            cartImg.style.width = (w || 32) + 'px';
+            cartImg.style.height = (h || 32) + 'px';
+          }
+
+          logoSubIcons.insertBefore(cartClone, headerLogoIcon);
+        } else {
+          // Fallback: insert as first child
+          logoSubIcons.insertBefore(cartClone, logoSubIcons.firstChild);
+        }
+
+        // Hide original cart (on the right)
         cartLink.style.display = 'none';
       }
     } else {
