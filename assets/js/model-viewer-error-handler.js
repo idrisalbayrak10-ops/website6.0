@@ -56,13 +56,11 @@
   // Also watch for dynamically added viewers
   if (window.MutationObserver) {
     const observer = new MutationObserver((mutations) => {
-      let hasNewViewers = false;
       mutations.forEach(mutation => {
         if (mutation.addedNodes.length > 0) {
           mutation.addedNodes.forEach(node => {
             if (node.tagName === 'MODEL-VIEWER') {
               enhanceViewer(node);
-              hasNewViewers = true;
             } else if (node.querySelectorAll) {
               node.querySelectorAll('model-viewer').forEach(enhanceViewer);
             }
@@ -76,6 +74,44 @@
       subtree: true
     });
   }
+
+  const loadFallbackModelViewer = (src) => {
+    if (window.customElements && window.customElements.get('model-viewer')) return;
+    if (document.querySelector(`script[src="${src}"]`)) return;
+
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = src;
+    script.setAttribute('crossorigin', 'anonymous');
+    script.onload = () => console.log('[model-viewer] Loaded fallback model-viewer script:', src);
+    script.onerror = () => console.warn('[model-viewer] Failed to load fallback model-viewer script:', src);
+    document.head.appendChild(script);
+  };
+
+  const tryModelViewerRecovery = () => {
+    if (window.customElements && window.customElements.get('model-viewer')) return;
+    loadFallbackModelViewer('/assets/js/model-viewer.min.js');
+    setTimeout(() => {
+      if (!window.customElements || !window.customElements.get('model-viewer')) {
+        console.warn('[model-viewer] Recovery attempt did not register model-viewer');
+      }
+    }, 5000);
+  };
+
+  window.addEventListener('error', (event) => {
+    const message = event && event.message ? String(event.message) : '';
+    if (/Content Security Policy/i.test(message) && /eval/i.test(message)) {
+      console.warn('[model-viewer] CSP eval block detected, attempting local fallback');
+      tryModelViewerRecovery();
+    }
+  });
+
+  setTimeout(() => {
+    if (document.querySelector('model-viewer') && !(window.customElements && window.customElements.get('model-viewer'))) {
+      console.warn('[model-viewer] model-viewer custom element not registered yet, trying local fallback');
+      tryModelViewerRecovery();
+    }
+  }, 12000);
 
   window.__modelViewerEnhanced = true;
   console.log('[model-viewer] Error handler initialized');

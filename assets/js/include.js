@@ -935,45 +935,77 @@ function ensureModelViewerLoaded() {
   if (window.customElements && window.customElements.get("model-viewer")) return;
   const googleSrc = "https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.0/model-viewer.min.js";
   const fallbackSrc = "https://unpkg.com/@google/model-viewer@3.0.0/dist/model-viewer.min.js";
+  const localSrc = "/assets/js/model-viewer.min.js";
   const existingGoogleScript = document.querySelector(`script[src="${googleSrc}"]`);
-  if (existingGoogleScript) return;
-  const loadModelViewer = () => {
-    if (window.customElements && window.customElements.get("model-viewer")) return;
+  const existingLocalScript = document.querySelector(`script[src="${localSrc}"]`);
+
+  const loadModelViewerScript = (src, onSuccess, onError) => {
+    if (window.customElements && window.customElements.get("model-viewer")) {
+      onSuccess?.();
+      return;
+    }
+
+    if (document.querySelector(`script[src="${src}"]`)) {
+      return;
+    }
+
     const script = document.createElement("script");
     script.type = "module";
-    script.src = googleSrc;
+    script.src = src;
     script.setAttribute('crossorigin', 'anonymous');
-    let timeoutId;
-    script.onerror = () => {
-      clearTimeout(timeoutId);
-      if (window.customElements && window.customElements.get("model-viewer")) return;
-      console.debug('[model-viewer] Primary CDN failed, trying fallback...');
-      const fallbackScript = document.createElement("script");
-      fallbackScript.type = "module";
-      fallbackScript.src = fallbackSrc;
-      fallbackScript.setAttribute('crossorigin', 'anonymous');
-      fallbackScript.onerror = () => {
-        console.warn('[model-viewer] Both CDN sources failed - model viewer may not work');
-      };
-      fallbackScript.onload = () => {
-        console.debug('[model-viewer] Fallback CDN loaded successfully');
-      };
-      document.head.appendChild(fallbackScript);
-    };
     script.onload = () => {
-      clearTimeout(timeoutId);
-      console.debug('[model-viewer] Primary CDN loaded successfully');
+      onSuccess?.();
     };
-    // Timeout for script load (catch any hanging requests)
-    timeoutId = setTimeout(() => {
-      if (!window.customElements || !window.customElements.get("model-viewer")) {
-        console.debug('[model-viewer] Primary CDN timeout, trying fallback...');
-        script.onerror?.();
-      }
-    }, 10000); // 10 second timeout
+    script.onerror = () => {
+      onError?.();
+    };
     document.head.appendChild(script);
   };
-  setTimeout(loadModelViewer, 800);
+
+  const tryLocalFallback = () => {
+    if (window.customElements && window.customElements.get("model-viewer")) return;
+    console.debug('[model-viewer] Trying local fallback...');
+    loadModelViewerScript(localSrc, () => {
+      console.debug('[model-viewer] Local fallback loaded successfully');
+    }, () => {
+      console.warn('[model-viewer] Local fallback failed too');
+    });
+  };
+
+  const tryFallback = () => {
+    if (window.customElements && window.customElements.get("model-viewer")) return;
+    console.debug('[model-viewer] Primary CDN failed, trying unpkg fallback...');
+    loadModelViewerScript(fallbackSrc, () => {
+      console.debug('[model-viewer] Fallback CDN loaded successfully');
+    }, () => {
+      console.warn('[model-viewer] Fallback CDN failed, trying local fallback...');
+      tryLocalFallback();
+    });
+  };
+
+  const loadPrimaryModelViewer = () => {
+    if (window.customElements && window.customElements.get("model-viewer")) return;
+    if (!existingGoogleScript) {
+      loadModelViewerScript(googleSrc, () => {
+        console.debug('[model-viewer] Primary CDN loaded successfully');
+      }, tryFallback);
+    } else {
+      console.debug('[model-viewer] Primary CDN script already present, waiting for registration...');
+    }
+
+    setTimeout(() => {
+      if (!window.customElements || !window.customElements.get("model-viewer")) {
+        console.debug('[model-viewer] model-viewer not registered after timeout, trying fallback...');
+        tryFallback();
+      }
+    }, 10000); // 10 second timeout
+  };
+
+  if (!existingLocalScript) {
+    setTimeout(loadPrimaryModelViewer, 800);
+  } else {
+    console.debug('[model-viewer] Local model-viewer script already present');
+  }
 }
 
 function createPreloaderLoader() {

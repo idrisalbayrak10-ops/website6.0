@@ -686,6 +686,23 @@
     gap: 6px;
 }
 
+@media (max-width: 1023px) {
+    .alien-dropdown-container {
+        position: static !important;
+    }
+
+    #alienMenu {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        min-width: min(92vw, 360px) !important;
+        width: auto !important;
+        max-width: min(92vw, 360px) !important;
+    }
+}
+
 #alienMenu:not([hidden]) {
     display: grid !important;
 }
