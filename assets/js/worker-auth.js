@@ -8,7 +8,8 @@ const AUTH_SOURCE_KEY = "albaspace_auth_source";
 function login(options = {}) {
   persistAuthState(options.source || "default");
   closeAuthUi(options);
-  window.location.href = WORKER_AUTH_URL;
+  const returnUrl = window.location.href;
+  window.location.href = WORKER_AUTH_URL + "?from=" + encodeURIComponent(returnUrl);
 }
 
 async function checkUser() {
@@ -207,9 +208,13 @@ function logout() {
   } catch (e) {
     console.warn('Unable to clear local auth state', e);
   }
+  // Чистим все возможные cookie (старые и новые)
   document.cookie = 'user_id=; Max-Age=0; path=/;';
   document.cookie = 'albamen_session_id=; Max-Age=0; path=/;';
-  window.location.reload();
+  document.cookie = 'albaspace_session=; Max-Age=0; path=/; SameSite=None; Secure;';
+  // Удаляем сессию на сервере, потом перезагружаем
+  fetch(WORKER_BASE_URL + '/logout', { credentials: 'include' })
+    .finally(() => window.location.reload());
 }
 
 window.login = login;
@@ -229,3 +234,4 @@ if (document.readyState === 'loading') {
     setTimeout(checkUser, 100);
   }
 }
+
