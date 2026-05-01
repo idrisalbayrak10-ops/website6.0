@@ -158,3 +158,45 @@ html.product-text-black .site-header *,
 html.product-text-black .footer * {
   background-color: transparent !important;
 }
+
+/* ============================================================
+   MOBILE DROPDOWN - Force opaque white dropdown on mobile
+   Ensures dropdown menus are not transparent and do not show
+   underlying page content through the menu.
+   This file is loaded last (footer) so rules win over earlier !important.
+   ============================================================ */
+@media (max-width: 1023px) {
+  /* Force active dropdown menu to be solid white */
+  .dropdown.active .dropdown-menu,
+  .dropdown.active .dropdown-menu * {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.12) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Neutralize any pseudo-element transparency that may tint the menu */
+  .dropdown.active .dropdown-menu::before,
+  .dropdown.active .dropdown-menu::after,
+  .dropdown::before,
+  .dropdown::after {
+    background: none !important;
+  }
+
+  /* Prevent overlay pseudo-element from dimming or tinting the menu */
+  .dropdown.active::before {
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+
+  /* Ensure product pages (product-text-black) also use solid white */
+  html.product-text-black .dropdown.active .dropdown-menu,
+  html.product-text-black .dropdown.active .dropdown-menu * {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+}

@@ -14,20 +14,20 @@ function repositionCartIconOnMobile() {
     if (!cartLink || !logoSubIcons || !alienContainer) return;
     
     if (e.matches || mediaQuery.matches) {
-      // Mobile: Move cart to logo icons area (after alien icon)
+      // Mobile: Move cart to logo icons area (top-left placement)
       const existingCart = logoSubIcons.querySelector('.header-cart-link.mobile-positioned');
       
       if (!existingCart) {
         // Clone the cart link for mobile positioning
         const cartClone = cartLink.cloneNode(true);
-        cartClone.classList.add('mobile-positioned');
+        cartClone.classList.add('mobile-positioned', 'mobile-cart-icon');
         cartClone.style.display = 'flex';
         cartClone.style.alignItems = 'center';
         cartClone.style.justifyContent = 'center';
-        cartClone.style.marginLeft = '8px';
+        cartClone.style.marginLeft = '0';
         
-        // Insert after alien container
-        alienContainer.parentNode.insertBefore(cartClone, alienContainer.nextSibling);
+        // Insert as the first item in the logo icons area for top-left placement
+        logoSubIcons.insertBefore(cartClone, logoSubIcons.firstChild);
         
         // Hide original cart
         cartLink.style.display = 'none';
