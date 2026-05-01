@@ -384,6 +384,7 @@
         align-items: center !important;
         padding: 12px 16px !important;
         height: auto !important;
+        position: relative !important;
     }
 
     /* 1. TOP LINE: Logo icons on left, Social + Lang on right */
@@ -438,12 +439,15 @@
 
     /* Show cart in logo-sub-icons and style it properly on mobile */
     .logo-sub-icons > .header-cart-link {
+        position: absolute !important;
+        top: 12px !important;
+        left: 12px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        order: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        z-index: 150 !important;
     }
 
     /* Style cart icon image on mobile */
