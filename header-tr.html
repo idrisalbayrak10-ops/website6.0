@@ -47,20 +47,22 @@
           </div>
 
           <div class="alien-auth-logged-in" hidden>
+            <div class="alien-user-summary">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="User avatar" width="40" height="40">
+              <div class="alien-user-name" id="accountMenuName" data-default-text="Hesap">Hesap</div>
+            </div>
+
             <a id="accountMenuLink"
                href="/account.html"
                data-account-page="/account.html"
-               class="alien-menu-item alien-menu-account"
+               class="alien-menu-item"
                role="menuitem">
-              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="" width="28" height="28">
-              <span id="accountMenuName" data-default-text="Hesap">Hesap</span>
+              Hesap
             </a>
-
-            <button type="button"
-                    class="alien-menu-item"
-                    onclick="logout()">
-              Çıkış Yap
-            </button>
+            <a href="/account.html#favorites" class="alien-menu-item" role="menuitem">Favoriler</a>
+            <a href="/account.html#purchased" class="alien-menu-item" role="menuitem">Satın Aldıklarım</a>
+            <button type="button" class="alien-menu-item" role="menuitem" onclick="logout()">Çıkış Yap</button>
+            <div id="user" class="worker-auth-user" hidden aria-live="polite"></div>
           </div>
         </div>
       </div>

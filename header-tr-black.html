@@ -12,12 +12,28 @@
           <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login" role="menuitem">Giriş Yap</a>
-          <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
-            Google ile Giriş Yap
-          </button>
-          <a href="#" class="alien-menu-item open-signup" role="menuitem">Kayıt Ol</a>
-          <div id="user" class="worker-auth-user" aria-live="polite"></div>
+          <div class="alien-auth-logged-out">
+            <a href="#" class="alien-menu-item open-login" role="menuitem">Giriş Yap</a>
+            <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })" role="menuitem">
+              Google ile Giriş Yap
+            </button>
+            <a href="#" class="alien-menu-item open-signup" role="menuitem">Kayıt Ol</a>
+          </div>
+
+          <div class="alien-auth-logged-in" hidden>
+            <div class="alien-user-summary">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="User avatar" width="40" height="40">
+              <div class="alien-user-name" id="accountMenuName" data-default-text="Hesap">Hesap</div>
+            </div>
+
+            <a id="accountMenuLink" href="/account.html" data-account-page="/account.html" class="alien-menu-item" role="menuitem">
+              Hesap
+            </a>
+            <a href="/account.html#favorites" class="alien-menu-item" role="menuitem">Favoriler</a>
+            <a href="/account.html#purchased" class="alien-menu-item" role="menuitem">Satın Aldıklarım</a>
+            <button type="button" class="alien-menu-item" role="menuitem" onclick="logout()">Çıkış Yap</button>
+            <div id="user" class="worker-auth-user" hidden aria-live="polite"></div>
+          </div>
         </div>
       </div>
       <a href="/cart.html" class="header-cart-link" aria-label="Sepet">

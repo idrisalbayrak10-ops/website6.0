@@ -12,12 +12,26 @@
           <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login">Войти</a>
-          <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
-            Войти через Google
-          </button>
-          <a href="#" class="alien-menu-item open-signup">Регистрация</a>
-          <div id="user" class="worker-auth-user"></div>
+          <div class="alien-auth-logged-out">
+            <a href="#" class="alien-menu-item open-login">Войти</a>
+            <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
+              Войти через Google
+            </button>
+            <a href="#" class="alien-menu-item open-signup">Регистрация</a>
+          </div>
+
+          <div class="alien-auth-logged-in" hidden>
+            <div class="alien-user-summary">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="User avatar" width="40" height="40">
+              <div class="alien-user-name" id="accountMenuName" data-default-text="Аккаунт">Аккаунт</div>
+            </div>
+
+            <a id="accountMenuLink" href="/rus/account.html" data-account-page="/rus/account.html" class="alien-menu-item" role="menuitem">Аккаунт</a>
+            <a href="/rus/account.html#favorites" class="alien-menu-item" role="menuitem">Избранное</a>
+            <a href="/rus/account.html#purchased" class="alien-menu-item" role="menuitem">Купленное</a>
+            <button type="button" class="alien-menu-item" role="menuitem" onclick="logout()">Выйти</button>
+            <div id="user" class="worker-auth-user" hidden aria-live="polite"></div>
+          </div>
         </div>
       </div>
       <a href="/rus/cart.html" class="header-cart-link" aria-label="Корзина">

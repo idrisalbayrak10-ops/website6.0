@@ -12,12 +12,26 @@
           <img src="/assets/icons/alien.png" alt="Account" width="32" height="32">
         </a>
         <div id="alienMenu" class="alien-menu" role="menu" hidden>
-          <a href="#" class="alien-menu-item open-login">Sign In</a>
-          <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
-            Sign in with Google
-          </button>
-          <a href="#" class="alien-menu-item open-signup">Sign Up</a>
-          <div id="user" class="worker-auth-user"></div>
+          <div class="alien-auth-logged-out">
+            <a href="#" class="alien-menu-item open-login">Sign In</a>
+            <button type="button" class="alien-menu-item alien-menu-google" onclick="login({ closeMenu: true, source: 'header-menu' })">
+              Sign in with Google
+            </button>
+            <a href="#" class="alien-menu-item open-signup">Sign Up</a>
+          </div>
+
+          <div class="alien-auth-logged-in" hidden>
+            <div class="alien-user-summary">
+              <img id="accountMenuAvatar" src="/assets/icons/alien.png" alt="User avatar" width="40" height="40">
+              <div class="alien-user-name" id="accountMenuName" data-default-text="Account">Account</div>
+            </div>
+
+            <a id="accountMenuLink" href="/eng/account.html" data-account-page="/eng/account.html" class="alien-menu-item" role="menuitem">Account</a>
+            <a href="/eng/account.html#favorites" class="alien-menu-item" role="menuitem">Favorites</a>
+            <a href="/eng/account.html#purchased" class="alien-menu-item" role="menuitem">Purchased</a>
+            <button type="button" class="alien-menu-item" role="menuitem" onclick="logout()">Sign Out</button>
+            <div id="user" class="worker-auth-user" hidden aria-live="polite"></div>
+          </div>
         </div>
       </div>
       <a href="/eng/cart.html" class="header-cart-link" aria-label="Cart">

@@ -52,6 +52,31 @@
   display: none;
 }
 
+.alien-user-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+}
+
+.alien-user-summary img {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.alien-user-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.site-header.black .alien-user-name {
+  color: #f8fafc;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
