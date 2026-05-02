@@ -368,23 +368,6 @@
         padding: 0 !important;
     }
 
-    /* Ensure all containers respect viewport width */
-    * {
-        max-width: 100vw !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Prevent any element from causing horizontal overflow */
-    .container, .page-wrapper, .glass-box, .hero, .card-container, .grid {
-        width: 100% !important;
-        max-width: 100vw !important;
-        overflow-x: hidden !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-    }
-
     .site-header {
         background: rgba(2, 6, 23, 0.95) !important;
         position: relative !important;
@@ -911,22 +894,17 @@
         overflow-wrap: break-word !important;
     }
 
-    /* Specific containers that might cause overflow */
-    .container, .page, .page-wrapper, .glass-box, .hero, .card-container, .grid,
-    .video-grid, .folders, .thumb-grid, .media-section, .media-controls {
-        width: 100% !important;
-        max-width: 100vw !important;
-        overflow-x: hidden !important;
-        margin: 0 !important;
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-    }
-
     /* Images and media elements */
-    img, video, iframe, model-viewer {
+    img, video, iframe {
         max-width: 100% !important;
         width: 100% !important;
         height: auto !important;
+    }
+
+    /* Model-viewer should keep its defined height */
+    model-viewer {
+        max-width: 100% !important;
+        width: 100% !important;
     }
 
     /* Text elements */
