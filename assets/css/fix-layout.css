@@ -752,13 +752,6 @@
     gap: 8px !important;
 }
 
-#alienMenu {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: flex-end !important;
-    gap: 8px !important;
-}
-
 #alienMenu .alien-menu-item {
     display: inline-flex !important;
     align-items: center !important;
