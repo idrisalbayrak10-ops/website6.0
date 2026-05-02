@@ -43,7 +43,7 @@
     <script>
       async function loadProtectedModel() {
         const viewer = document.getElementById('mainViewer');
-        const modelSlug = "zhurong";
+        const modelSlug = "atlas-zhurong";
 
         viewer.src = "/assets/models/zaglushka.glb";
 
@@ -56,7 +56,13 @@
             const data = await response.json();
             if (data.access === "premium") {
               console.log("✅ Доступ разрешен! Загружаем", modelSlug);
-              viewer.src = `https://albaspace-api.nncdecdgc.workers.dev/model?slug=${modelSlug}`;
+              // model-viewer не отправляет cookie сам — качаем вручную и создаём blob URL
+              const modelRes = await fetch(
+                `https://albaspace-api.nncdecdgc.workers.dev/model?slug=${modelSlug}`,
+                { credentials: "include" }
+              );
+              const blob = await modelRes.blob();
+              viewer.src = URL.createObjectURL(blob);
             } else {
               console.log("🔒 Нет доступа, показываем заглушку.");
             }
