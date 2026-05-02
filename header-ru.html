@@ -38,6 +38,7 @@
         <div class="dropdown-menu">
           <a href="/rus/hizmetler.html">УСЛУГИ</a>
           <a href="https://albaspace.com.tr/hyperclub" target="_blank">Hyper Club</a>
+          <a href="/rus/galeri.html">ГАЛЕРЕЯ</a>
         </div>
       </div>
       <a href="/rus/shop.html">МАГАЗИН</a>
@@ -58,11 +59,15 @@
         <a href="https://wa.me/905387781018" target="_blank"><img src="/assets/icons/watsupp.png"></a>
         <a href="https://www.youtube.com/@AlbaSpaceTr" target="_blank"><img src="/assets/icons/youtube.png"></a>
       </div>
-      <div class="top-lang-switch">
-        <a href="/index.html"><img src="/assets/icons/flag-tr.png" width="24"></a>
-        <a href="/eng/index.html"><img src="/assets/icons/flag-us.png" width="24"></a>
-        <a href="/rus/index.html"><img src="/assets/icons/flag-rus.png" width="24"></a>
-        <a href="/rus/cart.html" class="header-cart-link"><span class="header-cart-icon"><img src="/assets/icons/chart.png" width="28"><span class="header-cart-count" data-cart-count>0</span></span></a>
+      <div class="top-lang-switch lang-dropdown-wrapper">
+        <button class="lang-dropdown-toggle" aria-label="Изменить язык" aria-expanded="false" aria-haspopup="menu" onclick="toggleLangDropdown(event)">
+          <img id="currentLangFlag" src="/assets/icons/flag-rus.png" width="24" alt="">
+        </button>
+        <div class="lang-dropdown-menu" role="menu" hidden>
+          <a href="/index.html" class="lang-option" data-lang="tr" role="menuitem" onclick="closeLangDropdown()"><img src="/assets/icons/flag-tr.png" width="24" alt="Türkçe"></a>
+          <a href="/eng/index.html" class="lang-option" data-lang="en" role="menuitem" onclick="closeLangDropdown()"><img src="/assets/icons/flag-us.png" width="24" alt="English"></a>
+          <a href="/rus/index.html" class="lang-option" data-lang="ru" role="menuitem" onclick="closeLangDropdown()"><img src="/assets/icons/flag-rus.png" width="24" alt="Русский"></a>
+        </div>
       </div>
     </div>
   </div>
@@ -70,6 +75,7 @@
 
 <link rel="stylesheet" href="/assets/css/dropdown-optimized.css">
 <link rel="stylesheet" href="/assets/css/mobile-dropdown-horizontal.css">
+<link rel="stylesheet" href="/assets/css/lang-dropdown.css">
 <link rel="stylesheet" href="/assets/css/model-nav-overrides.css">
 <link rel="stylesheet" href="/assets/css/remove-blog-overlay.css">
 <link rel="stylesheet" href="/assets/css/fix-layout.css">
@@ -78,6 +84,7 @@
 <script src="/assets/js/menu-toggle.js" defer></script>
 <script src="/assets/js/cart.js" defer></script>
 <script src="/assets/js/lang-switch.js" defer></script>
+<script src="/assets/js/lang-dropdown.js" defer></script>
 <script src="/assets/js/ai-widget.js" defer></script>
 <script src="/assets/js/model-nav-loader.js" defer></script>
 <script src="/assets/js/worker-auth.js" defer></script>
