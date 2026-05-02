@@ -71,7 +71,17 @@
             // 3. Если воркер ответил "premium", меняем модель на секретную из R2
             if (data.access === "premium") {
               console.log("✅ Доступ разрешен! Загружаем премиум-модель...");
-              viewer.src = `https://albaspace-api.nncdecdgc.workers.dev/model?slug=${modelSlug}`;
+              // model-viewer не отправляет cookie — качаем вручную через blob URL
+              const modelRes = await fetch(
+                `https://albaspace-api.nncdecdgc.workers.dev/model?slug=${modelSlug}`,
+                { credentials: "include" }
+              );
+              if (!modelRes.ok) {
+                console.error("❌ Ошибка загрузки модели:", modelRes.status);
+              } else {
+                const blob = await modelRes.blob();
+                viewer.src = URL.createObjectURL(blob);
+              }
             } else {
               console.log("🔒 Доступа нет, оставлена бесплатная заглушка.");
             }
