@@ -23,6 +23,10 @@
     .account-actions { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
     .account-message { margin-top: 16px; color: #7dd3fc; }
     .btn-primary { background: #00c2ff; color: #020617; border: none; }
+    .account-section { margin-top: 32px; }
+    .account-section h2 { margin-bottom: 12px; font-size: 24px; }
+    .account-section p { margin-bottom: 16px; color: #9ca3af; }
+    .account-section-content { padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #d1d5db; }
   </style>
 </head>
 <body class="account-page">
@@ -53,6 +57,18 @@
         </div>
         <div id="accountMessage" class="account-message" aria-live="polite"></div>
       </form>
+    </section>
+
+    <section id="favorites" class="account-card account-section">
+      <h2>Favoriler</h2>
+      <p>Favori ürünlerinizi ve deneyimlerinizi burada görüntüleyebilirsiniz.</p>
+      <div class="account-section-content">Henüz favori bir öğe yok.</div>
+    </section>
+
+    <section id="purchased" class="account-card account-section">
+      <h2>Satın Aldıklarım</h2>
+      <p>Satın aldığınız ürünlerin veya hizmetlerin kısa bir listesini burada görebilirsiniz.</p>
+      <div class="account-section-content">Henüz satın alma geçmişiniz görünmüyor.</div>
     </section>
   </main>
   <script>
